@@ -1,0 +1,174 @@
+.statusbox
+{
+    padding-left: 10px;
+    
+   
+}
+.bigbox
+{
+    padding-top: 10px;
+    
+    height: 160px;
+    padding-bottom: 10px;
+    display: flex;
+}
+
+.Processing
+{
+    padding: 10px;
+    height: 100px;
+    width: 25%;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    backdrop-filter: blur(7px);
+    box-shadow: 0 .4rem .8rem #0005;
+    border-radius: .8rem;
+    justify-content: space-between;
+    margin: 10px;
+    transition: transform 0.3s ease;
+    
+}
+
+.Processing:hover {
+    transform: scale(1.1);
+  }
+
+
+.processimg
+{
+    padding-top: 10px;
+    padding-left: 20px;
+    height: 50px;
+    width: 50px;
+    
+}
+
+.shippingimg,
+.completeimg
+{
+    padding-top: 10px;
+    padding-left: 20px;
+    height: 50px;
+    width: 50px;
+    
+}
+
+
+.processimg img
+{
+    width: 60px;
+    height: 60px;
+    background: rgb(185, 185, 185);
+    border-radius: 8px;
+    color: white;
+    border: 1px solid grey;
+}
+
+.shippingimg img
+{
+    width: 60px;
+    height: 60px;
+    background: rgb(214, 233, 111);
+    border-radius: 8px;
+    color: white;
+    border: 1px solid grey;
+}
+
+
+
+
+.completeimg img
+{
+    width: 60px;
+    height: 60px;
+    background: greenyellow;
+    border-radius: 8px;
+    color: white;
+    border: 1px solid grey;
+}
+
+
+.proceP
+{
+    display: flex;
+    align-items: center;
+    padding-right: 40px;
+}
+
+.tableform
+{
+    background: white;
+    width: 98%;
+    max-height: 550px;
+    overflow-y: scroll;
+    border-radius: 8px;
+}
+
+.tableform table
+{
+    border-radius: 8px;
+}
+.buttonbox
+{
+    display: flex;
+    margin-top: 10px;
+    
+}
+
+  .buttonbox button {
+    margin-right: 10px;
+    background:#1d1b31 ;
+  }
+
+  .buttonbox button:hover
+  {
+    background:#200eeb;
+  }
+  .buttonbox button:active
+  {
+    background:#1d1b31 ;
+  }
+
+  #complete {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: green;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+  }
+
+  #complete:hover {
+    transform: scale(1.1);
+  }
+
+  #processing {
+    display: inline-block;
+      padding: 5px 10px;
+      background-color: grey;
+      color: white;
+      font-weight: bold;
+      border-radius: 4px;
+      transition: transform 0.3s ease;
+  }
+
+  #processing:hover {
+    transform: scale(1.1);
+  }
+
+
+  #Shipping {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: rgb(170, 243, 0);
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+  }
+
+  #Shipping:hover {
+    transform: scale(1.1);
+  }
