@@ -1,12 +1,11 @@
 <?php
   session_start();
-  require_once("config/Database.php");
-  
-  $db = \Config\Database::getInstance();
-  $conn = $db->getConnection();
 
-  $query = "SELECT * FROM product ORDER BY Prod_ID DESC LIMIT 8;";
-  $result = mysqli_query($conn, $query);
+  require_once("Controller/ProductController.php");
+  
+
+  $limitItems = new GetLimitItems();
+  $result = $limitItems->getItems();
 
   
 
@@ -138,7 +137,7 @@
     	<div class="container">
     		<div class="row">
 				<?php
-					  while($row = mysqli_fetch_assoc($result)){
+					  while($row = $result->fetch_assoc()){
 
 
 					?>
