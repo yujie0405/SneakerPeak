@@ -1,8 +1,8 @@
 <?php
   session_start();
-  include('database/config.php');
+  include("connection/config.php");
   $query = "SELECT *FROM product ORDER BY Prod_ID DESC LIMIT 8;";
-  $result=mysqli_query($conn,$query);
+  $result = mysqli_query($conn, $query);
 
   
 
