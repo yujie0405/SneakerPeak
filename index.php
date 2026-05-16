@@ -1,7 +1,11 @@
 <?php
   session_start();
-  include("connection/config.php");
-  $query = "SELECT *FROM product ORDER BY Prod_ID DESC LIMIT 8;";
+  require_once("config/Database.php");
+  
+  $db = \Config\Database::getInstance();
+  $conn = $db->getConnection();
+
+  $query = "SELECT * FROM product ORDER BY Prod_ID DESC LIMIT 8;";
   $result = mysqli_query($conn, $query);
 
   
