@@ -94,14 +94,20 @@
     <div class="cart-page" tabindex="0" role="region" aria-label="Shopping cart items">
     
             <table>
+                <colgroup>
+                    <col>
+                    <col class="cart-size-column">
+                    <col class="cart-quantity-column">
+                    <col class="cart-subtotal-column">
+                    <col class="cart-action-column">
+                </colgroup>
                 <thead>
                     <tr>
-                        
-                        <th colspan="2">Product</th>
-                        <th>Size</th>
-                        <th>Quantity</th> <!-- New table head -->
-                        <th>Subtotal</th>
-                        <th>Delete</th>
+                        <th scope="col" class="cart-product-cell">Product</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col" class="cart-subtotal-cell">Subtotal</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,23 +117,25 @@
                     ?>
                     <tr>
                         
-                        <td colspan="2">
+                        <td class="cart-product-cell">
                             <div class="cart-info">
-                                <img src="prod/<?= rawurlencode($row['Prod_Img1']) ?>">
+                                <img src="prod/<?= rawurlencode($row['Prod_Img1']) ?>" alt="">
                                 <div class="note">
                                     <p><?= htmlspecialchars($row['Product_Name']) ?></p>
                                     <small>Price: RM<?php echo number_format((float) $row['Current_Price'], 2); ?></small>
                                 </div>
                             </div>
                         </td>
-                        <td><?php  echo $row ['Select_Size']; ?></td>
-                        <td> 
+                        <td><?= htmlspecialchars($row['Select_Size']) ?></td>
+                        <td>
+                            <div class="cart-quantity">
                             <button class="minus" type="button" aria-label="Decrease quantity" <?= (int) $row['Select_qty'] <= 1 ? 'disabled' : '' ?> data-product="<?= htmlspecialchars($row['Product_Name']) ?>" data-size="<?= htmlspecialchars($row['Select_Size']) ?>" onclick="changeQuantity('minus.php', this)">-</button>
                             
                             <input type="text" value="<?php echo $row['Select_qty']; ?>" aria-label="Quantity" readonly>
                             <button class="plush" type="button" aria-label="Increase quantity" data-product="<?= htmlspecialchars($row['Product_Name']) ?>" data-size="<?= htmlspecialchars($row['Select_Size']) ?>" onclick="changeQuantity('plush.php', this)">+</button>
+                            </div>
                         </td>
-                        <td class="amount"><?php echo number_format(  $amount,2); ?></td>
+                        <td class="amount cart-subtotal-cell">RM <?= number_format($amount, 2) ?></td>
                         <td>
                                 <form method="post" onsubmit="return confirm('Remove this item from your cart?')">
                                     <input type="hidden" name="cart_token" value="<?= htmlspecialchars($token) ?>">
