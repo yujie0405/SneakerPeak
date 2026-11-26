@@ -1,59 +1,126 @@
 # SneakerPeak
 
-SneakerPeak is a PHP 8.2 storefront and admin application for XAMPP. It uses MariaDB through the PHP MySQLi extension.
+SneakerPeak is a sneaker e-commerce web application I originally built for my university Final Year Project (FYP). I wanted to build a complete online shop where customers could browse sneakers, choose a size, and place an order, while administrators could manage products, stock, promotions, and fulfilment from one dashboard.
 
-## Local setup
+The project has since been revamped. The current version separates request handling, database queries, and page templates, uses a relational database schema, and supports a responsive storefront and admin interface.
 
-1. Create a database and import `database/sneakerpeak.sql` for a fresh installation. Keep the existing database when upgrading a local installation.
-2. Copy `.env.example` to `.env` and set the five `DB_*` values. A blank local database password is supported. Configure the sender and SMTP relay for verification and password-reset mail.
-3. In XAMPP, enable `mod_rewrite` and load `deploy/apache/sneakerpeak.conf` from `httpd-vhosts.conf`. Adjust the two Windows paths if XAMPP is installed elsewhere. Restart Apache and open [SneakerPeak](http://sneakerpeak.localhost/).
-4. Enable `CHECKOUT_DEMO_MODE=true` only on a local test database to exercise checkout through invoice generation. The demo changes order, cart, and stock data in the connected database. Live payment requires a provider integration.
+## Technology stack
 
-## Routes and assets
+| Layer | Technology |
+| --- | --- |
+| Backend | PHP 8.2+ with MySQLi for database access and OpenSSL for encrypted admin product links |
+| Frontend | Server-rendered HTML, CSS, JavaScript, and Bootstrap |
+| Database | MariaDB and SQL with InnoDB tables and foreign keys |
+| Local development | XAMPP on Windows, Apache with `mod_rewrite`, and phpMyAdmin |
 
-The public entry point is `public/index.php`. The legacy filenames are registered in `src/Config/routes.php`, including case-insensitive aliases such as `payment.php` and `admin_OrderDetails.php`. Apache preserves the old `/SneakerPeak/` entry point and legacy image, script, stylesheet, and font URLs. Existing product, logo, and profile image filenames continue to resolve from the legacy asset folders.
+## Storefront and account pages
 
-The homepage, catalog, sign-in, customer profiles, wishlists, cart, checkout, order history, admin dashboards, and admin product and order management use controllers under `Controller`. Legacy scripts dispatch through the same entry point. Promotion views still contain some of their original queries and request handling. The shared palette is in `public/assets/css/theme.css`.
-
-Cart checkout takes prices and shipping from the server and snapshots the order and lines. Address selection saves the address snapshot and payment method. Demo completion locks the owned order, updates inventory, removes the matching cart lines, and marks the payment complete in one transaction. A repeated completion leaves inventory unchanged.
-
-The bundled Stripe PHP library and `prod.zip` are outside the document root. The archive contains product image copies. The previous Stripe experiment had no application caller. Replace or revoke historical Stripe and Google Maps keys through their respective provider accounts. Supply a restricted browser key through `MAPS_BROWSER_KEY` if the embedded map is needed.
-
-## Migrated form and AJAX contracts
-
-| Legacy URL | Method and input | Caller and response |
+| Page | Route | What it does |
 | --- | --- | --- |
-| `Login.php`, `Register.php`, `Forgot_pwd.php`, `otp_user.php`, `otp_reset.php`, `chg_pwd.php` | Existing form POST fields | Account forms render validation errors or redirect to the next step. Remember my email stores the email only. A successful sign-in upgrades eligible legacy passwords to hashes. |
-| `prod.php` | GET `Prod_Name` or POST item size, quantity, and cart token | Product links render details. The add-to-cart form displays the result and the server uses the current product price. |
-| `plush.php`, `minus.php` | POST product name, size, and cart token | The cart reloads on success. Quantity stays within the signed-in customer's cart and available stock. |
-| `cart.php`, `selectaddress.php`, `Payment.php` | GET views or POST forms with cart token | Checkout proceeds to the shipping address, payment method, and invoice. |
-| `fetch_address.php` | GET `addressOption` | Checkout receives plain text from the signed-in customer's saved address. |
-| `admin_productdetails.php` | GET encrypted `id`, or POST edits to the same URL with a catalog token | Product detail links continue to work after renaming a product. |
-| `delete_item.php`, `Available_item.php` | POST encrypted `id` and catalog token | Admin catalog pages update overall product status. |
-| `changestatus.php`, `telluser.php` | POST order code and order token | Admin order details receives plain-text status feedback and the controller sends the configured notification. |
+| Home | `/`, `index.php` | Introduces the shop and shows recently added products. |
+| Shop | `menu.php` | Shows a paginated product grid with search and brand, category, and subcategory filters. |
+| Product details | `prod.php` | Shows product photos, details, price, available sizes and stock. Customers can choose a size and add the item to their cart. |
+| Size chart | `sizecar.php` | Shows shoe-size conversion tables. |
+| About and contact | `about.php`, `contact.php` | Introduce the store and show its contact information. |
+| Sign in and register | `Login.php`, `Register.php` | Sign in or create a customer account. |
+| Verify registration | `otp_user.php` | Confirms a new account using an emailed verification code. |
+| Recover a password | `Forgot_pwd.php`, `otp_reset.php`, `chg_pwd.php`, `user_changed_password.php` | Request a reset code, verify it, set a new password, and see confirmation. |
+| Wishlist | `wishlist.php` | Shows saved products and lets customers remove them. |
+| Cart | `cart.php` | Adjusts quantities, removes items, applies a promotion, and starts checkout. |
+| Address selection | `selectaddress.php` | Selects or enters a shipping address and chooses a payment method. |
+| Payment | `Payment.php` | Presents the selected payment method. Local demo mode can complete checkout for testing. |
+| Order history | `OrderHistory.php` | Lists the customer's orders and their progress. |
+| Invoice and receipt | `invoice.php`, `recei.php` | Show printable order and payment summaries. |
+| Profile, account and password | `profile_1.php`, `Account_setting.php`, `Password_setting.php` | Manage profile information, saved addresses, profile photo, and password. |
+| Sign out | `Logout.php` | Ends the current session. |
 
-## Migrated database
+## Admin pages
 
-The PHP application now expects the live migrated schema. The SQL in database/proposed-schema.sql is a historical design draft. The PHP queries follow the actual schema with Id primary keys, E_ProductStatus, T_Cart, and T_Promotecode. Keep sneakerpeak_legacy and database/sneakerpeak.sql available for reconciliation. The application does not fall back to the legacy database.
+| Page | Route | What it does |
+| --- | --- | --- |
+| Dashboard | `DashBoad.php` | Gives administrators an overview of store activity and recent records. |
+| Product dashboard | `admin-ProductDashboard.php` | Shows product reporting and stock summaries. |
+| Order dashboard | `admin-OrderDashboard.php` | Summarizes orders and their status. |
+| Product list | `admin_productlist.php` | Searches and filters the catalog, shows up to 20 products per page, and links to product details and creation. |
+| Product details | `admin_productdetails.php` | Edits product information and updates availability or quantity for individual sizes. |
+| Add product | `admin_addproduct.php` | Creates a product with its images and size inventory in one submission. |
+| Brand and Categories | `admin_addbrand.php` | Manages brands, categories, subcategories, and brand logos. |
+| Order list | `admin-Orderlist.php` | Finds orders by code, date range, payment type, payment status, and order status. |
+| Order details | `admin_Orderdetails.php` | Shows the order lines, totals, payment and shipping details, and fulfilment actions. |
+| Promotions | `admin_promote.php` | Creates and edits discount codes and filters them by code or expiry date. |
+| Customers | `viewCustomers.php` | Searches customers by name, paginates results, and deactivates accounts while preserving their order history. |
+| Add administrator | `add_newAdmin.php` | Creates an administrator account through an authorized admin session. |
+| Admin profile, account and password | `admin_profile.php`, `admin_account_setting.php`, `admin_password_setting.php` | Manage the signed-in administrator's profile and credentials. |
 
-Users with a null PasswordHash need Forgot Password before signing in. This also applies to administrators. Recovery requires an active account and access to its email address. Set up working mail delivery before onboarding imported users. Registration and recovery use hashed, expiring codes bound to the current PHP session, with five verification attempts. Complete the code flow in the same browser session. Shared session storage is required if multiple PHP workers run on different servers. The existing user table needs no OTP column for this setup. Pre-migration sign-in sessions are invalidated, and admin access requires both the user flag and a matching active admin extension.
+The route map in [src/Config/routes.php](src/Config/routes.php) also lists form and AJAX endpoints for actions such as cart quantity changes, saved-address retrieval, inventory updates, image delivery, and order notifications.
 
-The live read-only check found nine users with null password hashes, including four admins. Six imported orders have no shipping snapshot, and one order line has no current product reference. Shipment data remains blank when the migration could not establish a snapshot. The order line still displays its saved description, size, price and quantity. Imported size systems are UNSPECIFIED. The current size-label forms remain unambiguous because the active schema has no product with repeated size labels across systems.
+## Database tables
 
-On the migrated database copy, verify customer and admin login, denied customer access to admin pages, registration, verification, recovery, saved addresses, catalog and product details, wishlist, cart, promotions, demo checkout, repeat payment submission, order history, invoices, receipts, and admin management. Route tests ran with a local mail capture and demo payments enabled. SMTP delivery to a real mailbox and real payment processing require separate verification. The legacy Search and filter routes lead to the catalog, and the old call_pic and t demo routes lead to the scoped cart.
+The current schema is defined in [database/proposed-schema.sql](database/proposed-schema.sql). Each table has its own `Id` primary key and `CreatedDate` and `AdjustedDate` audit columns. Foreign keys use descriptive names, such as `T_Admin.UserId` referencing `T_User.Id`.
 
-## Product categories and image storage
+| Table | Stores |
+| --- | --- |
+| `T_User` | Customer and administrator identities, password hashes, profile information, and account state. |
+| `T_Admin` | Administrator-specific records linked to `T_User`. |
+| `E_Brand` | Brand names and logo paths. |
+| `E_Category` | Main product categories such as Male, Female, and Kid. |
+| `E_SubCategory` | Product subcategory names. |
+| `E_Size` | Shoe-size labels and sizing systems. |
+| `E_ProductStatus` | Product status codes such as available, out of stock, and deactivated. |
+| `T_Product` | Product details, price, image paths, and references to its brand, category, subcategory, and status. |
+| `T_ProductSizeAndCategory` | Quantity and availability for each product and size combination. |
+| `T_CustomerAddress` | Saved customer addresses. |
+| `T_Cart` | The customer's selected products, sizes, and quantities before checkout. |
+| `T_Wishlist` | References linking customers to saved products. |
+| `E_PromoteType` | Discount types for fixed amounts, percentages, and free shipping. |
+| `T_Promotecode` | Promotion codes, type IDs, values, expiry dates, and active states. |
+| `T_Order` | Order totals, payment and fulfilment status, and the shipping address saved at checkout. |
+| `T_OrderLineItem` | Purchased products, sizes, quantities, and prices as recorded when the order was created. |
 
-For an existing migrated MariaDB database, apply database/migrations/001-product-categories.sql before using the updated product pages. Select the migrated database in phpMyAdmin before importing the migration. It backfills product categories from Audience, leaves the original values available for reconciliation, and keeps subcategory assignments independent. Resolve duplicate product names before applying the migration if your database contains any.
+## Project folder structure
 
-Set IMAGE_BASE_DIR to a directory writable by PHP. A relative path resolves from the repository root. The XAMPP default is storage/catalog-images, which is outside the public document root. The app creates Product, UserProfile, and Logo folders as needed and stores relative image paths. Existing uploads in public/assets keep their original URLs. Back up the configured image directory alongside the database.
+```text
+SneakerPeak/
+├── Controller/
+│   ├── Admin/                 # Dashboard and management actions
+│   └── Legacy/                # Older route handlers, including active actions
+├── Manager/                   # Image storage and encrypted product links
+├── src/
+│   ├── App/
+│   │   ├── Middleware/        # Session and access checks
+│   │   ├── Models/            # Database queries
+│   │   └── Services/          # Account, checkout, email, and validation logic
+│   ├── Config/                # Routes and environment configuration
+│   └── Core/                  # Bootstrap, router, and shared database connection
+├── resources/views/
+│   ├── account/               # Authentication, profile, wishlist, and orders
+│   ├── admin/                 # Dashboard and management templates
+│   ├── layouts/               # Shared page layouts
+│   ├── partials/              # Navigation, footer, and sidebars
+│   └── storefront/            # Home, catalog, cart, and checkout
+├── public/
+│   ├── index.php              # Web entry point
+│   └── assets/                # CSS, JavaScript, fonts, and original images
+├── database/
+│   ├── migrations/            # Upgrades for existing migrated databases
+│   ├── proposed-schema.sql    # Current table definitions for a fresh database
+│   └── sneakerpeak.sql        # Original FYP schema and data snapshot
+├── deploy/apache/             # XAMPP virtual host configuration
+├── storage/catalog-images/    # Default local storage for new uploads
+├── .env.example               # Environment configuration template
+└── composer.json              # PHP requirements and autoload configuration
+```
 
-Apply database/migrations/002-product-image-paths.sql to backfill imported product image paths. The product image columns store `prod/filename` for files under `public/assets/prod` and `Product/filename` for uploads under IMAGE_BASE_DIR. Product listings and details resolve both stored path formats.
+## Run locally with XAMPP
 
-Product drafts submit the product and size rows together. In a JavaScript-enabled browser, server-side validation keeps the draft and selected images in the form. Update a size quantity and its availability separately from product details. To delete a referenced brand, category, or subcategory, reassign its products using Edit product first.
+1. Start Apache and MySQL in the XAMPP Control Panel. For a fresh installation, create a database in phpMyAdmin and import [database/proposed-schema.sql](database/proposed-schema.sql). This creates the current schema and initial lookup codes. Products, customers, and orders need to be created or migrated separately.
+2. Copy `.env.example` to `.env`. Set the five `DB_*` values and configure the sender and SMTP relay for registration and password recovery. Accounts with a missing password hash can recover access through the password reset flow.
+3. Set `PRODUCT_LINK_KEY` to a Base64-encoded 32-byte key. Generate it locally with `php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"`. Changing it invalidates existing encrypted admin product links.
+4. Enable Apache's `mod_rewrite` and load [deploy/apache/sneakerpeak.conf](deploy/apache/sneakerpeak.conf) from `httpd-vhosts.conf`. Adjust the Windows paths if needed. Restart Apache and open [SneakerPeak](http://sneakerpeak.localhost/).
+5. To test checkout through invoice generation, set `CHECKOUT_DEMO_MODE=true` against a local test database. Demo checkout changes order, cart, and stock data. Live payment requires a provider integration.
 
-Set `PRODUCT_LINK_KEY` in the private `.env` to a Base64-encoded 32-byte key. Generate it with `php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"`. Use the same key across app workers. Changing the key invalidates existing admin product links. PHP needs the OpenSSL extension.
+### Existing databases and images
 
-## Promotion types
+Keep the original `sneakerpeak.sql` and any `sneakerpeak_legacy` staging database for reconciliation. Use the migration scripts in order where applicable to the installed schema. Migration `001` is for databases that still need categories backfilled from the legacy `Audience` column. Migration `002` normalizes legacy product image paths. For older promotion schemas, run `php database/migrations/003-promotion-types.php --prepare`, verify promotion management and checkout, then run it with `--finalize`.
 
-On an existing migrated database, run `php database/migrations/003-promotion-types.php --prepare` before deploying the promotion lookup code. This installs the lookup and backfills missing IDs while preserving existing rows. Verify promotion management and checkout with the new code, then run the same migration with `--finalize` during a maintenance window to require the foreign key and remove the legacy type column. Fresh installations using `database/proposed-schema.sql` already have the finalized structure.
+Set `IMAGE_BASE_DIR` to a path PHP can write to. The default is `storage/catalog-images`, with separate `Product/`, `UserProfile/`, and `Logo/` folders. The application can also read existing images from `public/assets`. Back up both the database and the configured upload directory.
