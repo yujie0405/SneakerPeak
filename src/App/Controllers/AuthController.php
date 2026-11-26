@@ -4,6 +4,8 @@ use SneakerPeak\App\Services\AuthService;
 use SneakerPeak\App\Services\PasswordResetService;
 
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/AuthService.php';
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/UserModel.php';
+use SneakerPeak\App\Models\UserModel;
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/PasswordResetService.php';
 require SNEAKERPEAK_ROOT . '/database/Database_Connection.php';
 
@@ -17,12 +19,7 @@ $password = (string) ($_POST['password'] ?? '');
 $confirmation = (string) ($_POST['cpassword'] ?? '');
 $errors = [];
 
-$findAccount = static function (string $role, string $address) use ($conn): ?array {
-    $table = $role === 'admin' ? 'admin' : 'customer';
-    $statement = $conn->prepare("SELECT * FROM `$table` WHERE email = ? LIMIT 1");
-    $statement->execute([$address]);
-    return $statement->get_result()->fetch_assoc();
-};
+$findAccount = static fn(string $address): ?array => UserModel::find($conn, $address);
 
 $redirect = static function (string $page): never {
     header('Location: ' . $page);
@@ -34,18 +31,25 @@ if (isset($_POST['register'])) {
         $errors['email'] = 'Enter a name and valid email address.';
     } elseif ($password !== $confirmation || strlen($password) < 8 || !AuthService::canHash($password)) {
         $errors['password'] = 'Enter matching passwords between 8 and 72 bytes.';
-    } elseif ($findAccount('customer', $email) || $findAccount('admin', $email)) {
+    } elseif ($findAccount($email)) {
         $errors['email'] = 'This email address is already registered.';
     } else {
-        $insert = $conn->prepare(
-            "INSERT INTO customer (name, Customer_Address, Customer_ContractNumber, email, password, code, status)
-             VALUES (?, ?, ?, ?, ?, 0, 'notverified')"
-        );
-        $insert->execute([
-            $name, (string) ($_POST['address'] ?? ''), (string) ($_POST['phone'] ?? ''), $email,
-            password_hash($password, PASSWORD_DEFAULT),
-        ]);
-        if (PasswordResetService::issue($conn, ['id' => $conn->insert_id, 'email' => $email], 'verify')) {
+        $conn->begin_transaction();
+        try {
+            $conn->execute_query(
+                'INSERT INTO T_User (DisplayName, Email, EmailKey, Phone, PasswordHash) VALUES (?, ?, ?, ?, ?)',
+                [$name, $email, UserModel::emailKey($email), (string) ($_POST['phone'] ?? ''), password_hash($password, PASSWORD_DEFAULT)]
+            );
+            $userId = (string) $conn->insert_id;
+            UserModel::saveAddress($conn, $userId, 1, (string) ($_POST['address'] ?? ''));
+            $conn->commit();
+        } catch (mysqli_sql_exception $error) {
+            $conn->rollback();
+            if ($error->getCode() !== 1062) throw $error;
+            $errors['email'] = 'This email address is already registered.';
+            return;
+        }
+        if (PasswordResetService::issue(['id' => $userId, 'email' => $email], 'verify')) {
             $_SESSION['email'] = $email;
             $_SESSION['info'] = 'Check your email for your verification code.';
             $redirect('otp_user.php');
@@ -53,16 +57,14 @@ if (isset($_POST['register'])) {
         $errors['otp-error'] = 'Your account was created. Sign in to request another verification email.';
     }
 } elseif (isset($_POST['login'])) {
-    $role = 'customer';
-    $account = $findAccount($role, $email);
-    if ($account === null) {
-        $role = 'admin';
-        $account = $findAccount($role, $email);
-    }
-    if ($account === null || !AuthService::verify($password, $account['password'])) {
+    $account = $findAccount($email);
+    $role = !empty($account['IsAdmin']) ? 'admin' : 'customer';
+    if ($account && $account['IsActive'] && $account['password'] === null) {
+        $errors['email'] = 'Use Forgot Password to set a password for this account.';
+    } elseif (!UserModel::canAuthenticate($account) || !AuthService::verify($password, $account['password'])) {
         $errors['email'] = 'Incorrect email or password!';
-    } elseif ($role === 'customer' && $account['status'] !== 'verified') {
-        if (PasswordResetService::issue($conn, $account, 'verify')) {
+    } elseif ($role === 'customer' && !$account['EmailVerified']) {
+        if (PasswordResetService::issue($account, 'verify')) {
             $_SESSION['email'] = $account['email'];
             $_SESSION['info'] = 'Check your email for your verification code.';
             $redirect('otp_user.php');
@@ -75,6 +77,7 @@ if (isset($_POST['register'])) {
         session_regenerate_id(true);
         $_SESSION = [
             $role === 'admin' ? 'AdminID' : 'CustomerID' => $account['id'],
+            'schema_session' => 2,
             'email' => $account['email'],
             'name' => $account['name'],
         ];
@@ -92,8 +95,8 @@ if (isset($_POST['register'])) {
     }
 } elseif (isset($_POST['check-email'])) {
     unset($_SESSION['verified_reset'], $_SESSION['otp']);
-    $account = $findAccount('customer', $email);
-    if ($account && $account['status'] === 'verified' && PasswordResetService::issue($conn, $account, 'reset')) {
+    $account = $findAccount($email);
+    if (UserModel::canAuthenticate($account) && PasswordResetService::issue($account, 'reset')) {
         $_SESSION['email'] = $account['email'];
         $_SESSION['info'] = 'Check your email for your password reset code.';
         $redirect('otp_reset.php');
@@ -101,16 +104,21 @@ if (isset($_POST['register'])) {
     $errors['email'] = 'Could not send a reset code for this address.';
 } elseif (isset($_POST['check']) || isset($_POST['check-reset-otp'])) {
     $purpose = isset($_POST['check-reset-otp']) ? 'reset' : 'verify';
-    $verified = PasswordResetService::verify($conn, $purpose, (string) ($_POST['otp'] ?? ''));
+    $verified = PasswordResetService::verify($purpose, (string) ($_POST['otp'] ?? ''));
     if ($verified === null) {
         $errors['otp-error'] = 'The code is incorrect or has expired.';
     } elseif ($purpose === 'reset') {
+        $account = $findAccount($verified['email']);
+        if (!UserModel::canAuthenticate($account) || (string) $account['id'] !== $verified['id'] || $account['password'] !== $verified['password']) {
+            $errors['otp-error'] = 'The reset code is no longer valid.';
+            return;
+        }
         $_SESSION['verified_reset'] = $verified;
         $_SESSION['info'] = 'Choose a new password.';
         $redirect('chg_pwd.php');
     } else {
-        $update = $conn->prepare("UPDATE customer SET code = 0, status = 'verified' WHERE id = ? AND code = ?");
-        $update->execute([$verified['id'], $verified['code']]);
+        $conn->execute_query('UPDATE T_User SET EmailVerified = 1 WHERE Id = ? AND EmailKey = ? AND IsActive = 1',
+            [$verified['id'], UserModel::emailKey($verified['email'])]);
         unset($_SESSION['info']);
         $redirect('Login.php');
     }
@@ -120,10 +128,10 @@ if (isset($_POST['register'])) {
         || strlen($password) < 8 || !AuthService::canHash($password)) {
         $errors['password'] = 'Use a valid reset code and matching passwords between 8 and 72 bytes.';
     } else {
-        $update = $conn->prepare('UPDATE customer SET code = 0, password = ? WHERE id = ? AND code = ?');
-        $update->execute([password_hash($password, PASSWORD_DEFAULT), $verified['id'], $verified['code']]);
+        $conn->execute_query('UPDATE T_User SET PasswordHash = ?, EmailVerified = 1 WHERE Id = ? AND EmailKey = ? AND IsActive = 1 AND BINARY PasswordHash <=> ?',
+            [password_hash($password, PASSWORD_DEFAULT), $verified['id'], UserModel::emailKey($verified['email']), $verified['password']]);
         unset($_SESSION['verified_reset']);
-        if ($update->affected_rows === 1) {
+        if ($conn->affected_rows === 1) {
             $_SESSION['info'] = 'Your password changed. Sign in with your new password.';
             $redirect('user_changed_password.php');
         }

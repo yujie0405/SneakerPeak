@@ -110,14 +110,11 @@ require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
                  </thead>
                  <tbody>
                   <?php
-                  $queri="SELECT * FROM promote_code";
+                  $queri="SELECT Code AS Promote_Code, PromotionValue AS Value, ExpiresOn AS Expire_Date, PromotionType AS Promote_type, Details,
+                    IF(IsActive=1 AND (ExpiresOn IS NULL OR ExpiresOn >= CURRENT_DATE), 'Available', 'Expired') AS PromoteCode_Status FROM T_Promotecode";
                   $resul=mysqli_query($conn,$queri);
                   $count=1;
                   while($rows=mysqli_fetch_assoc($resul)){
-                    $sql = "UPDATE promote_code
-                            SET PromoteCode_Status = 'expired'
-                            WHERE Expire_Date <= CURDATE()";
-                            $do=mysqli_query($conn,$sql);
                 
                   ?>
                        <tr>
@@ -141,68 +138,33 @@ require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php
 if (isset($_POST['submit'])) {
-  $PCode = $_POST['Promote_Code'];
-  $value = $_POST['Promote_CodeValue'];
-  $Exdate = $_POST['ExpireDate'];
-  $CD = $_POST['CodeDetails'];
-  $type=$_POST['promotetype'];
-  $status="Available";
-  // Assuming you have already established a database connection
- 
-  // Check if the $PCode already exists in the database
-  $query = "SELECT COUNT(*) AS count FROM promote_code WHERE Promote_Code = '$PCode'";
-  $result = mysqli_query($conn,$query);
-  $row = $result->fetch_assoc();
-  $count = $row['count'];
-
-  if ($count > 0) {
-    // $PCode already exists in the database
-    ?>
-    <script>
-        Swal.fire({
-                title: 'Error',
-                text: 'The promotional code already exists. Please try a new one.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-    </script>
-    <?php
-  } else {
-    // Insert the new promotional code into the database
-    $insertQuery = "INSERT INTO promote_code (Promote_Code,Value,Expire_Date,Promote_type,Details,PromoteCode_Status) VALUES ('$PCode', '$value', '$Exdate','$type','$CD','$status')";
-    $insertResult = mysqli_query($conn,$insertQuery);
-
-    if ($insertResult) {
-      // Send email to all customers
-      $query = "SELECT email FROM customer";
-      $result = mysqli_query($conn, $query);
-    
-      while ($row = mysqli_fetch_assoc($result)) {
-        $to = $row['email'];
-        $subject = "New Promotional Code Available";
-        $message = "Dear customer,\n\nA new promotional code is available: $PCode. Enjoy the discounts!\n\nRegards,\nSneaker Peak";
-    
-        // Send email
-        \SneakerPeak\App\Services\EmailService::send($to, $subject, $message);
-      }
-    
-      ?><script>
-      Swal.fire({
-                position: 'center',
-                icon: 'success',
-                title: 'Promotional code successfully added and emails sent to customers.',
-                showConfirmButton: false,
-                timer: 2000
-            }).then(() => {
-                window.location = "admin_promote.php";
-            });
-
-      </script><?php
-    } 
-  }
-}
-
-?>
+    $code = trim((string) ($_POST['Promote_Code'] ?? ''));
+    $kind = match ($_POST['promotetype'] ?? '') {
+        'Value Off', 'FIXED' => 'FIXED', 'Percentage Off', 'PERCENTAGE' => 'PERCENTAGE',
+        'Free Shipping', 'FREE_SHIPPING' => 'FREE_SHIPPING', default => null,
+    };
+    $value = filter_var($_POST['Promote_CodeValue'] ?? null, FILTER_VALIDATE_FLOAT);
+    $date = (string) ($_POST['ExpireDate'] ?? '');
+    $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+    try {
+        if ($code === '' || !$kind || $value === false || $value < 0
+            || ($kind === 'PERCENTAGE' && $value > 100) || !$parsed || $parsed->format('Y-m-d') !== $date) {
+            throw new DomainException('Enter a valid promotion code, value, type and expiry.');
+        }
+        $conn->execute_query('INSERT INTO T_Promotecode (Code, PromotionType, PromotionValue, ExpiresOn, Details, IsActive)
+            VALUES (?, ?, ?, ?, ?, 1)', [$code, $kind, $value, $date, (string) ($_POST['CodeDetails'] ?? '')]);
+        $message = 'Promotion added.';
+        $recipients = $conn->query('SELECT Email FROM T_User WHERE IsActive = 1 AND IsAdmin = 0 AND EmailVerified = 1');
+        foreach ($recipients as $recipient) {
+            \SneakerPeak\App\Services\EmailService::send($recipient['Email'], 'New Promotional Code Available',
+                "A new SneakerPeak promotional code is available: $code.");
+        }
+    } catch (Throwable $error) {
+        $message = $error instanceof DomainException ? $error->getMessage()
+            : ($error->getCode() === 1062 ? 'This promotion code already exists.' : 'Could not save the promotion.');
+    } ?>
+    <script>Swal.fire({title: <?= json_encode($message, JSON_HEX_TAG) ?>});</script>
+<?php } ?>
 <script>
   function generateRandomNumber() {
     var randomNumber = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit number

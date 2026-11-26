@@ -55,3 +55,21 @@ Paginate the `menu.php` results on the server after applying search and filters.
 - Provide page numbers and Previous and Next controls when the result set spans multiple pages. Mark the current page and make navigation work with keyboard and touch.
 - Preserve the search query and selected filters when moving between pages. Return to page 1 when the search or filters change or are cleared. Handle invalid and out-of-range page numbers without breaking the listing.
 - Verify 0, 20, 21, and more than 40 matching products. With 21 results, show 20 on the first page and one on the second. Verify that the same pagination rules apply to filtered results and that products appear once across pages.
+
+## 8. Switch PHP queries to the migrated database schema
+
+Fix the homepage failure in `src/App/Models/ProductModel.php`. `ProductModel::latest()`, called by `HomeController`, currently runs `SELECT * FROM product ORDER BY Prod_ID DESC LIMIT 8`. The active `sneakerpeak` database now uses `T_Product` with primary key `Id`. Update the query and its view data together so the homepage renders the latest products with their existing images, prices, and links.
+
+Use `database/proposed-schema.sql` and read-only checks against the active XAMPP database to verify exact columns, keys, and lookup codes. Audit every reachable PHP query across models, services, controllers, legacy endpoints, and views, including writes and AJAX handlers. Use the following table mapping.
+
+| Legacy tables | New tables and data |
+| --- | --- |
+| `customer`, `admin` | `T_User`, `T_Admin`. Use `T_User.Id` for identity and synchronize authorization checks with the migrated admin role. |
+| `brand`, `sub_category`, `product`, `sizeandqty` | `E_Brand`, `E_SubCategory`, `T_Product`, `T_ProductSizeAndCategory`, `E_Size`, and `E_ProductStatus`. Resolve lookups through IDs and map product image paths and status codes explicitly. |
+| `cart`, `wishlist`, `promote_code` | `T_Cart`, `T_Wishlist`, `T_Promotecode`. Scope reads and writes to the correct user or role. Read wishlist names and images from `T_Product`. |
+| `oder`, `oder_details`, `oder_address` | `T_Order` and `T_OrderLineItem`. Read historical shipping information from the order snapshot. Read and edit saved customer addresses through `T_CustomerAddress`. |
+
+- Update both SQL and PHP consumers of legacy column names. Keep active routes and form or AJAX contracts working. Preserve the catalog filters and 20-item pagination.
+- Check customer and admin login, registration, account verification, password reset, and sessions. The new user table has no legacy OTP column. Identify what storage or schema changes these flows require and document any blocked flows. Treat migrated accounts with a null password hash as requiring password recovery.
+- Preserve the already imported data in `sneakerpeak`. Keep `sneakerpeak_legacy` and `database/sneakerpeak.sql` available for unresolved records. The one-time import script has been removed. Run write-path tests on a database copy and avoid triggering live email or payment calls.
+- Verify the homepage, catalog and product details, customer accounts, wishlist, cart, promotions, checkout, order history and invoices, and admin product and order management. Report which workflows passed and any remaining data or schema gaps.

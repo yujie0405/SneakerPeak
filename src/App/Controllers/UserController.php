@@ -8,8 +8,10 @@
     class registerUser {
         public function register($username, $email, $password) {
             global $conn;
-            $query = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
-            return mysqli_query($conn, $query);
+            return $conn->execute_query(
+                'INSERT INTO T_User (DisplayName, Email, EmailKey, PasswordHash) VALUES (?, ?, ?, ?)',
+                [$username, $email, strtolower(trim($email)), password_hash($password, PASSWORD_DEFAULT)]
+            );
         }
     }   
 

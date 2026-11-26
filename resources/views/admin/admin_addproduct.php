@@ -42,7 +42,7 @@
             <h4>Product Brand:</h4>
             <select name="prod_brand" id="" class="selectinfo" required>
             <?php
-                    $query = "select * from brand";
+                    $query = "SELECT Name AS Brand_Name FROM E_Brand";
                     $result = mysqli_query($conn,$query);
                     while($row = mysqli_fetch_assoc($result)){
 
@@ -76,7 +76,7 @@
             <h4>Product Sub-Category:</h4>
             <select name="Sub-Cetegory" id=""  class="selectinfo" required>
             <?php
-                    $query = "select * from sub_category";
+                    $query = "SELECT Name AS S_Name FROM E_SubCategory";
                     $result = mysqli_query($conn,$query);
                     while($row = mysqli_fetch_assoc($result)){
 
@@ -122,7 +122,7 @@
             <select name="p_Name" id="" class="selectinfo">
               <option value="Select" style="display: none;">Select Product</option>
                 <?php
-                    $query = "select * from product";
+                    $query = "SELECT Name AS Prod_Name, Image1Path AS Prod_img1 FROM T_Product";
                     $result = mysqli_query($conn,$query);
                     while($row = mysqli_fetch_assoc($result)){
 
@@ -180,128 +180,59 @@
   </section>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php
-    if (isset($_POST['submit'])) {
-      $product_name = $_POST['prod_name'];
-      
-      // Check if the product with the same name already exists
-      $existingProductQuery = "SELECT * FROM product WHERE Prod_Name = '$product_name'";
-      $existingProductResult = mysqli_query($conn, $existingProductQuery);
-      
-      if (mysqli_num_rows($existingProductResult) > 0) {
-          // Product already exists, display an alert message
-          ?>
-          <script> Swal.fire({
-        title: 'Product already exists',
-        text: 'Please use another name.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-    });</script><?php
-      } else {
-          // Product does not exist, proceed with insertion
-          $product_brand = $_POST['prod_brand'];
-          $product_price = $_POST['prod_price'];
-          $product_colour = $_POST['prod_colour'];
-          $product_gender = $_POST['prod_gender'];
-          $product_SubC = $_POST['Sub-Cetegory'];
-          $product_details = $_POST['prod_details'];
-          $product_status = $_POST['status'];
-  
-          $product_img1 = $_FILES['prod_img1']['name'];
-          $prod_img1_tmp = $_FILES['prod_img1']['tmp_name'];
-  
-          $product_img2 = $_FILES['prod_img2']['name'];
-          $prod_img2_tmp = $_FILES['prod_img2']['tmp_name'];
-  
-          $product_img3 = $_FILES['prod_img3']['name'];
-          $prod_img3_tmp = $_FILES['prod_img3']['tmp_name'];
-  
-          $img_upload_path = SNEAKERPEAK_ASSETS . '/prod/';
-          move_uploaded_file($prod_img1_tmp, $img_upload_path . $product_img1);
-          move_uploaded_file($prod_img2_tmp, $img_upload_path . $product_img2);
-          move_uploaded_file($prod_img3_tmp, $img_upload_path . $product_img3);
-  
-          $prod = mysqli_query($conn, "INSERT INTO product(Prod_Name,Prod_Brand,Prod_Price,Prod_Colour,Prod_Cetegory,Prod_SubC,Prod_Details,Prod_Img1,Prod_Img2,Prod_Img3,Prod_Status) 
-          VALUES ('$product_name','$product_brand','$product_price','$product_colour','$product_gender','$product_SubC','$product_details','$product_img1','$product_img2','$product_img3','$product_status')");
-          if($prod)
-          {
-            ?>
-            <script>
-               Swal.fire({
-                title: 'Product Added',
-                text: 'The product has been successfully added.',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            }).then(function() {
-                // Redirect or perform any additional action after the user clicks 'OK'
-                 window.location.href = 'admin_addproduct.php';
-            });
-            </script>
-
-          <?php
-          }
-      }
-  }
-  
-  
-
-  if (isset($_POST['subm'])) {
-    $p_name = $_POST['p_Name'];
-    $p_S = $_POST['prod_Size'];
-    $p_q = $_POST['prod_qty'];
-  
-    // Check if the record already exists for the product and size
-    $existingSizeQuery = "SELECT * FROM sizeandqty WHERE Prod_Name = '$p_name' AND Prod_Size = '$p_S'";
-    $existingSizeResult = mysqli_query($conn, $existingSizeQuery);
-  
-    if (mysqli_num_rows($existingSizeResult) > 0) {
-        // Record already exists, update the quantity
-        $existingSizeRow = mysqli_fetch_assoc($existingSizeResult);
-        $existingQty = $existingSizeRow['Prod_Qty'];
-        $newQty = $existingQty + $p_q;
-  
-        $updateSizeQuery = "UPDATE sizeandqty SET Prod_Qty = '$newQty' WHERE Prod_Name = '$p_name' AND Prod_Size = '$p_S'";
-        $updateSizeResult = mysqli_query($conn, $updateSizeQuery);
-  
-        if ($updateSizeResult) {
-           ?> <script>
-               Swal.fire({
-                position: 'center',
-                icon: 'success',
-                title: 'Quantity Update successfully.',
-                showConfirmButton: false,
-                timer: 2000
-            }).then(() => {
-                window.location = "admin_addproduct.php";
-            });
-
-           
-           </script><?php
-        } 
-    } else {
-        // Record does not exist, insert a new record
-        $statusqty='Available';
-        $insertSizeQuery = "INSERT INTO sizeandqty(Prod_Name, Prod_Size, Prod_Qty,Qty_Status) VALUES ('$p_name', '$p_S', '$p_q','$statusqty')";
-        $insertSizeResult = mysqli_query($conn,$insertSizeQuery);
-  
-        if ($insertSizeResult) {
-           ?><script>
-              Swal.fire({
-                position: 'center',
-                icon: 'success',
-                title: 'Size  inserted successfully.',
-                showConfirmButton: false,
-                timer: 2000
-            }).then(() => {
-                window.location = "admin_addproduct.php";
-            });
-          
-            </script><?php
-        } 
+if (isset($_POST['submit'])) {
+    require_once SNEAKERPEAK_ROOT . '/src/App/Services/CatalogImageUpload.php';
+    $files = [];
+    $directory = SNEAKERPEAK_ASSETS . '/prod/';
+    try {
+        $name = trim((string) ($_POST['prod_name'] ?? ''));
+        $price = filter_var($_POST['prod_price'] ?? null, FILTER_VALIDATE_FLOAT);
+        if ($name === '' || $price === false || $price <= 0) throw new DomainException('Enter a product name and positive price.');
+        if ($conn->execute_query('SELECT Id FROM T_Product WHERE Name = ?', [$name])->fetch_row()) {
+            throw new DomainException('Product already exists.');
+        }
+        $brand = $conn->execute_query('SELECT Id FROM E_Brand WHERE Name = ?', [(string) $_POST['prod_brand']])->fetch_row()[0] ?? null;
+        $sub = $conn->execute_query('SELECT Id FROM E_SubCategory WHERE Name = ?', [(string) $_POST['Sub-Cetegory']])->fetch_row()[0] ?? null;
+        if (!$brand || !$sub) throw new DomainException('Choose a valid brand and subcategory.');
+        foreach (['prod_img1','prod_img2','prod_img3'] as $field) {
+            $files[] = \SneakerPeak\App\Services\CatalogImageUpload::save($_FILES[$field] ?? [], $directory);
+        }
+        $conn->execute_query(
+            "INSERT INTO T_Product (BrandId, SubCategoryId, Name, Price, Colour, Audience, Details, Image1Path, Image2Path, Image3Path, ProductStatusId)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT Id FROM E_ProductStatus WHERE Code = 'AVAILABLE'))",
+            [$brand, $sub, $name, $price, $_POST['prod_colour'], $_POST['prod_gender'], $_POST['prod_details'], ...$files]
+        );
+        $resultMessage = 'Product added.';
+    } catch (Throwable $error) {
+        foreach ($files as $file) unlink($directory . $file);
+        $resultMessage = $error instanceof DomainException ? $error->getMessage() : 'Could not save the product.';
     }
-  }
-
-
-?>
+} elseif (isset($_POST['subm'])) {
+    $qty = filter_var($_POST['prod_qty'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 4294967295]]);
+    $size = (string) ($_POST['prod_Size'] ?? '');
+    if (!$qty || !preg_match('/^\d+(?:\.5)?$/D', $size)) {
+        $resultMessage = 'Choose a valid size and quantity.';
+    } else {
+        $conn->begin_transaction();
+        try {
+            $id = $conn->execute_query('SELECT Id FROM T_Product WHERE Name = ? ORDER BY Id LIMIT 1 FOR UPDATE', [(string) ($_POST['p_Name'] ?? '')])->fetch_row()[0] ?? null;
+            if (!$id) throw new DomainException('Choose an existing product.');
+            $conn->execute_query("INSERT INTO E_Size (SizingSystem, SizeLabel, SortOrder) VALUES ('UNSPECIFIED', ?, ?) ON DUPLICATE KEY UPDATE Id = Id",
+                [$size, (int) round(2 * (float) $size)]);
+            $sizeId = $conn->execute_query("SELECT Id FROM E_Size WHERE SizingSystem = 'UNSPECIFIED' AND SizeLabel = ?", [$size])->fetch_row()[0];
+            $conn->execute_query('INSERT INTO T_ProductSizeAndCategory (ProductId, SizeId, Qty, IsAvailable) VALUES (?, ?, ?, 1)
+                ON DUPLICATE KEY UPDATE Qty = Qty + VALUES(Qty)', [$id, $sizeId, $qty]);
+            $conn->commit();
+            $resultMessage = 'Stock added.';
+        } catch (Throwable $error) {
+            $conn->rollback();
+            $resultMessage = $error instanceof DomainException ? $error->getMessage() : 'Could not save stock.';
+        }
+    }
+}
+if (isset($resultMessage)) { ?>
+    <script>Swal.fire({title: <?= json_encode($resultMessage, JSON_HEX_TAG) ?>});</script>
+<?php } ?>
   <script>
   let arrow = document.querySelectorAll(".arrow");
   for (var i = 0; i < arrow.length; i++) {

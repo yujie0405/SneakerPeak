@@ -7,7 +7,7 @@ use SneakerPeak\App\Services\CheckoutService;
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/CheckoutService.php';
 require SNEAKERPEAK_ROOT . '/database/config.php';
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 $customer = (string) ($_SESSION['CustomerID'] ?? '');
 $token = $_SESSION['cart_token'] ??= bin2hex(random_bytes(32));
 $message = null;

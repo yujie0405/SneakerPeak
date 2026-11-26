@@ -7,7 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !in_array($field, ['Customer_Address
 }
 
 require SNEAKERPEAK_ROOT . '/database/config.php';
-$statement = $conn->prepare("SELECT `$field` FROM customer WHERE id = ?");
-$statement->execute([(string) $_SESSION['CustomerID']]);
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/UserModel.php';
 header('Content-Type: text/plain; charset=UTF-8');
-echo $statement->get_result()->fetch_row()[0] ?? '';
+echo \SneakerPeak\App\Models\UserModel::address($conn, (string) $_SESSION['CustomerID'], $field === 'Customer_Address' ? 1 : 2);

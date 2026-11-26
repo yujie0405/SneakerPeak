@@ -5,19 +5,19 @@ include SNEAKERPEAK_ROOT . '/database/config.php';
 // Check if the user has submitted a date range
 if (isset($_POST['start_date']) && isset($_POST['end_date'])) {
     // Get the start and end dates from the user input
-    $start_date = date('d-m-Y', strtotime($_POST['start_date']));
-    $end_date = date('d-m-Y', strtotime($_POST['end_date']));
+    $start_date = date('Y-m-d', strtotime($_POST['start_date']));
+    $end_date = date('Y-m-d', strtotime($_POST['end_date']));
 
     // Prepare the SQL query with the user-provided date range
-    $queryt = "SELECT Order_Date AS order_date, SUM(Order_TotalAmmount) AS total_sales FROM oder WHERE Order_Date BETWEEN '$start_date' AND '$end_date' GROUP BY Order_Date";
+    $queryt = "SELECT OrderedOn AS order_date, SUM(NetItemsAmount) AS total_sales FROM T_Order WHERE OrderedOn BETWEEN '$start_date' AND '$end_date' GROUP BY OrderedOn";
 } else {
     // If no date range is provided, display data for the current week
     $currentDate = date('d-m-Y');
-    $weekStart = date('d-m-Y', strtotime('monday this week', strtotime($currentDate)));
-    $weekEnd = date('d-m-Y', strtotime('sunday this week', strtotime($currentDate)));
+    $weekStart = date('Y-m-d', strtotime('monday this week', strtotime($currentDate)));
+    $weekEnd = date('Y-m-d', strtotime('sunday this week', strtotime($currentDate)));
     
     // Prepare the SQL query for the current week
-    $queryt = "SELECT Order_Date AS order_date, SUM(Order_TotalAmmount) AS total_sales FROM oder WHERE Order_Date BETWEEN '$weekStart' AND '$weekEnd' GROUP BY Order_Date";
+    $queryt = "SELECT OrderedOn AS order_date, SUM(NetItemsAmount) AS total_sales FROM T_Order WHERE OrderedOn BETWEEN '$weekStart' AND '$weekEnd' GROUP BY OrderedOn";
 }
 
 // Assuming you have a valid database connection, execute the query using mysqli

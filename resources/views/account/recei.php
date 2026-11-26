@@ -166,9 +166,12 @@
 									75450 Bukit Beruang, Melaka
 								</td>
 								<td>
-                 <br />
-									<br />
-									<br/>
+                                    <?php if (!empty($row['Order_Address'])) { ?>
+                                        Ship to:<br />
+                                        <?= htmlspecialchars($row['Receiver_Name'] ?? '') ?><br />
+                                        <?= htmlspecialchars($row['Order_Address']) ?><br />
+                                        <?= htmlspecialchars($row['Receiver_Contract'] ?? '') ?>
+                                    <?php } ?>
 									
 								</td>
 				

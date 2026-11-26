@@ -27,13 +27,28 @@ final class RequireSession
             || str_starts_with($route, 'src/App/Controllers/Admin/');
         $customerPage = in_array($name, self::CUSTOMER_PAGES, true);
 
-        if (!$adminAction && !$customerAction && !$adminPage && !$customerPage) {
-            return true;
-        }
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+        $id = $_SESSION['AdminID'] ?? $_SESSION['CustomerID'] ?? null;
+        if ($id !== null) {
+            $isAdmin = isset($_SESSION['AdminID']);
+            $valid = false;
+            if (($_SESSION['schema_session'] ?? null) === 2) {
+                require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+                $db = \SneakerPeak\Core\Database::getInstance()->getConnection();
+                $valid = (bool) $db->execute_query(
+                    'SELECT 1 FROM T_User u LEFT JOIN T_Admin a ON a.UserId = u.Id AND a.AdminFlag = 1
+                     WHERE u.Id = ? AND u.IsActive = 1 AND u.IsAdmin = ?
+                       AND u.IsAdmin = (a.UserId IS NOT NULL) AND (u.IsAdmin = 1 OR u.EmailVerified = 1)',
+                    [$id, (int) $isAdmin]
+                )->fetch_row();
+            }
+            if (!$valid) {
+                $_SESSION = [];
+                session_regenerate_id(true);
+            }
         }
+        if (!$adminAction && !$customerAction && !$adminPage && !$customerPage) return true;
         $sessionKey = $adminAction || $adminPage ? 'AdminID' : 'CustomerID';
         if (isset($_SESSION[$sessionKey])) {
             return true;

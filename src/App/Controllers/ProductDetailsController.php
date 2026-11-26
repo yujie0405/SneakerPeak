@@ -7,7 +7,7 @@ require SNEAKERPEAK_ROOT . '/database/config.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/ProductModel.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/CartModel.php';
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 $Name = (string) ($_GET['Prod_Name'] ?? $_POST['Prod_Name'] ?? '');
 if ($Name === '') {
     header('Location: menu.php');
@@ -35,5 +35,5 @@ if (isset($_POST['add-tocard'])) {
     $cartMessage = $added ? 'Successfully added to the cart' : 'Choose an available size and quantity.';
 }
 
-$sizes = ProductModel::sizes($conn, $Name);
+$sizes = ProductModel::sizes($conn, (string) $product['Prod_ID']);
 require SNEAKERPEAK_ROOT . '/resources/views/storefront/prod.php';

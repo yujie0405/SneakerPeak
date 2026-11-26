@@ -1,9 +1,10 @@
 <?php
 
 require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/ProductModel.php';
 
 $pn = (string) ($_GET['prodName'] ?? $_SESSION['prodName'] ?? '');
-$find = $conn->prepare('SELECT * FROM product WHERE Prod_Name = ? LIMIT 1');
+$find = $conn->prepare(\SneakerPeak\App\Models\ProductModel::CATALOG . ' WHERE p.Name = ? ORDER BY p.Id LIMIT 1');
 $find->execute([$pn]);
 $row = $find->get_result()->fetch_assoc();
 if (!$row) {
@@ -26,21 +27,13 @@ if (isset($_POST['Update'])) {
     } else {
         $conn->begin_transaction();
         try {
-            $duplicate = $conn->prepare('SELECT Prod_ID FROM product WHERE Prod_Name = ? AND Prod_ID <> ? LIMIT 1');
+            $duplicate = $conn->prepare('SELECT Id FROM T_Product WHERE Name = ? AND Id <> ? LIMIT 1');
             $duplicate->execute([$name, $row['Prod_ID']]);
             if ($duplicate->get_result()->fetch_row()) {
                 throw new DomainException('A product already uses this name.');
             }
-            $update = $conn->prepare('UPDATE product SET Prod_Name = ?, Prod_Price = ?, Prod_Details = ? WHERE Prod_ID = ?');
+            $update = $conn->prepare('UPDATE T_Product SET Name = ?, Price = ?, Details = ? WHERE Id = ?');
             $update->execute([$name, $price, $details, $row['Prod_ID']]);
-            if ($name !== $pn) {
-                $inventory = $conn->prepare('UPDATE sizeandqty SET Prod_Name = ? WHERE Prod_Name = ?');
-                $inventory->execute([$name, $pn]);
-                $cart = $conn->prepare('UPDATE cart SET Product_Name = ? WHERE Product_Name = ?');
-                $cart->execute([$name, $pn]);
-                $wishlist = $conn->prepare('UPDATE wishlist SET prod_name = ? WHERE prod_name = ?');
-                $wishlist->execute([$name, $pn]);
-            }
             $conn->commit();
             $_SESSION['prodName'] = $name;
             header('Location: admin_productdetails.php?prodName=' . rawurlencode($name));
@@ -57,9 +50,11 @@ if (isset($_POST['Update'])) {
 }
 
 $inventory = $conn->prepare(
-    "SELECT *, CASE WHEN CAST(Prod_Qty AS SIGNED) = 0 THEN 'UnAvailable' ELSE Qty_status END AS Display_status
-     FROM sizeandqty WHERE Prod_Name = ? ORDER BY CAST(Prod_Size AS DECIMAL(10, 2))"
+    "SELECT p.Name AS Prod_Name, z.SizeLabel AS Prod_Size, i.Qty AS Prod_Qty,
+       IF(i.Qty > 0 AND i.IsAvailable = 1, 'Available', 'UnAvailable') AS Display_status
+     FROM T_ProductSizeAndCategory i JOIN E_Size z ON z.Id = i.SizeId JOIN T_Product p ON p.Id = i.ProductId
+     WHERE i.ProductId = ? ORDER BY z.SortOrder, z.Id"
 );
-$inventory->execute([$pn]);
+$inventory->execute([$row['Prod_ID']]);
 $sizes = $inventory->get_result()->fetch_all(MYSQLI_ASSOC);
 require SNEAKERPEAK_ROOT . '/resources/views/admin/admin_productdetails.php';

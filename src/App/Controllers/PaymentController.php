@@ -7,9 +7,8 @@ require SNEAKERPEAK_ROOT . '/database/config.php';
 
 $customer = (string) $_SESSION['CustomerID'];
 $Ordercode = (string) ($_SESSION['Ordercode'] ?? '');
-$order = $conn->prepare('SELECT * FROM oder WHERE UID = ? AND Order_code = ?');
-$order->execute([$customer, $Ordercode]);
-$row = $order->get_result()->fetch_assoc();
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/OrderModel.php';
+$row = \SneakerPeak\App\Models\OrderModel::owned($conn, $customer, $Ordercode);
 if (!$row || !in_array($row['Payment_Type'], ['Card_Payment', 'QR_Payment'], true)) {
     header('Location: selectaddress.php');
     exit;

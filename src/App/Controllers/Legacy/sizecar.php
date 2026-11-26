@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
 $sizeGroups = [
     'Nike, Jordan, Under Armour refer (US) size in Hoopsstation website.' => [

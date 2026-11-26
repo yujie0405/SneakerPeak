@@ -8,8 +8,8 @@ if (!is_string($code) || $code === '') {
     exit;
 }
 $statement = $conn->prepare(
-    "UPDATE oder SET ask = 0, Order_Status = 'Complete'
-     WHERE UID = ? AND Order_code = ? AND ask <> '0'"
+    "UPDATE T_Order SET ConfirmationRequested = 0, OrderStatus = 'Complete'
+     WHERE UserId = ? AND OrderCode = ? AND ConfirmationRequested <> 0"
 );
 $statement->execute([(string) $_SESSION['CustomerID'], $code]);
 if (!$statement->affected_rows) {

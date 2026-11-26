@@ -9,9 +9,10 @@ final class PromotionModel
     public static function availableFor(mysqli $connection, string $customerId, string $code): ?array
     {
         $statement = $connection->prepare(
-            "SELECT p.* FROM promote_code p WHERE p.Promote_Code = ?
-             AND p.PromoteCode_Status = 'Available' AND NOT EXISTS (
-                 SELECT 1 FROM oder o WHERE o.UID = ? AND o.Promote_Code = p.Promote_Code
+            "SELECT p.Id, p.Code, p.PromotionValue AS Value, p.PromotionType AS Promote_type, p.Details
+             FROM T_Promotecode p WHERE p.Code = ?
+             AND p.IsActive = 1 AND (p.ExpiresOn IS NULL OR p.ExpiresOn >= CURRENT_DATE) AND NOT EXISTS (
+                 SELECT 1 FROM T_Order o WHERE o.UserId = ? AND (o.PromotecodeId = p.Id OR o.PromotionCodeSnapshot = p.Code)
              ) LIMIT 1"
         );
         $statement->execute([$code, $customerId]);

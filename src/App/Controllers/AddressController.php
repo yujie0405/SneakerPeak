@@ -1,12 +1,11 @@
 <?php
 
 require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/OrderModel.php';
 
 $UID = (string) $_SESSION['CustomerID'];
 $orderCode = (string) ($_SESSION['Ordercode'] ?? '');
-$order = $conn->prepare('SELECT * FROM oder WHERE UID = ? AND Order_code = ?');
-$order->execute([$UID, $orderCode]);
-$row = $order->get_result()->fetch_assoc();
+$row = \SneakerPeak\App\Models\OrderModel::owned($conn, $UID, $orderCode);
 if (!$row) {
     header('Location: cart.php');
     exit;
@@ -16,7 +15,7 @@ if ($row['Payment_Status'] === 'Complete') {
     exit;
 }
 
-$quantity = $conn->prepare('SELECT COALESCE(SUM(Order_qty), 0) FROM oder_details WHERE UID = ? AND Order_code = ?');
+$quantity = $conn->prepare('SELECT COALESCE(SUM(l.Qty), 0) FROM T_OrderLineItem l JOIN T_Order o ON o.Id = l.OrderId WHERE o.UserId = ? AND o.OrderCode = ?');
 $quantity->execute([$UID, $orderCode]);
 $totalQuantity = (int) $quantity->get_result()->fetch_row()[0];
 $token = $_SESSION['cart_token'] ??= bin2hex(random_bytes(32));
@@ -43,19 +42,15 @@ if (isset($_POST['go'])) {
         $address = implode(', ', array_filter($addressParts, static fn($part) => $part !== ''));
         $conn->begin_transaction();
         try {
-            $lock = $conn->prepare('SELECT Payment_Status FROM oder WHERE UID = ? AND Order_code = ? FOR UPDATE');
+            $lock = $conn->prepare('SELECT PaymentStatus FROM T_Order WHERE UserId = ? AND OrderCode = ? FOR UPDATE');
             $lock->execute([$UID, $orderCode]);
             if (($lock->get_result()->fetch_row()[0] ?? null) !== 'Paying') {
                 throw new DomainException('The order is no longer awaiting payment.');
             }
-            $remove = $conn->prepare('DELETE FROM oder_address WHERE UID = ? AND Order_code = ?');
-            $remove->execute([$UID, $orderCode]);
-            $save = $conn->prepare(
-                'INSERT INTO oder_address (UID, Order_code, Order_Address, Receiver_Name, Receiver_Contract) VALUES (?, ?, ?, ?, ?)'
+            $conn->execute_query(
+                'UPDATE T_Order SET ShippingAddressSnapshot = ?, ShippingRecipientSnapshot = ?, ShippingPhoneSnapshot = ?, PaymentType = ?
+                 WHERE UserId = ? AND OrderCode = ?', [$address, $recipient, $phone, $method, $UID, $orderCode]
             );
-            $save->execute([$UID, $orderCode, $address, $recipient, $phone]);
-            $update = $conn->prepare('UPDATE oder SET Payment_Type = ? WHERE UID = ? AND Order_code = ?');
-            $update->execute([$method, $UID, $orderCode]);
             $conn->commit();
             header('Location: Payment.php');
             exit;

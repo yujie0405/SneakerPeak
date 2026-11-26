@@ -195,7 +195,7 @@ require_once SNEAKERPEAK_ROOT . '/src/App/Services/EmailService.php';
 						</thead>
 						<tbody>
 							<?php
-							$sql = "SELECT * FROM admin";
+							$sql = "SELECT u.Id AS id, u.DisplayName AS name, u.Email AS email, u.Phone AS Admin_ContactNumber FROM T_User u JOIN T_Admin a ON a.UserId=u.Id WHERE u.IsAdmin=1 AND a.AdminFlag=1";
 							$result = $conn->query($sql);
 							$count = 1;
 							if ($result->num_rows > 0) {
@@ -364,91 +364,32 @@ $email = "";
 $name = "";
 $errors = array();
 
-if(isset($_POST["add"]))
-{
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-    $cpassword = mysqli_real_escape_string($conn, $_POST['cpassword']);
-
-    $errors = [];
+if (isset($_POST['add'])) {
     require_once SNEAKERPEAK_ROOT . '/src/App/Services/AuthService.php';
-    if ($_POST['password'] !== $_POST['cpassword'] || strlen((string) $_POST['password']) < 8
-        || !\SneakerPeak\App\Services\AuthService::canHash((string) $_POST['password'])) {
-        echo '<p role="alert">Enter matching passwords between 8 and 72 bytes.</p>';
-        return;
-    }
-    // Check if the email exists in the customer table
-	$customer_check = "SELECT email FROM customer WHERE email = '$email'";
-
-	// Check if the email exists in the admin table
-	$admin_check = "SELECT email FROM admin WHERE email = '$email'";
-
-	// Combine the queries using UNION
-	$email_check = "($customer_check) UNION ($admin_check)";
-
-	$res = mysqli_query($conn, $email_check);
-
-	if (mysqli_num_rows($res) > 0) {
-		// Email exists in either customer or admin table
-
-		?>
-		<script>
-			Swal.fire({
-				icon: 'error',
-				title: 'Oops...',
-				text: 'Email that you have entered already exists!',
-				})
-		</script>
-		<?php
-	}
-	else if(count($errors) === 0)
-    {
-        $password = password_hash((string) $_POST['password'], PASSWORD_DEFAULT);
-        $insert_data = "INSERT INTO admin (name, email, password)
-                        values('$name', '$email', '$password')";
-        $data_check = mysqli_query($conn, $insert_data);
-
-        if ($data_check) {
-
-			echo "<script>
-              Swal.fire({
-                  position: 'center',
-                  icon: 'success',
-                  title: 'Admin Added!',
-                  showConfirmButton: false,
-                  timer: 1500
-              }).then(function() {
-                  window.location.href = 'add_newAdmin.php';
-              });
-          </script>";
-		  
-		  $subject = "Registration Confirmation";
-		  $message = "Dear $name,\n\nThank you for becoming a new admin on our website. Your account has been successfully created.\n\nBelow are your registration details:\n\nEmail: $email\nPassword: $password\n\nPlease keep this information secure and do not share it with anyone.\n\nIf you have any questions or need further assistance, feel free to contact us.\n\nBest regards,\nYour Website Team";
-		  
-		  if (\SneakerPeak\App\Services\EmailService::send($email, $subject, $message)) {
-			  $info = "We've sent a confirmation email to your registered email address - $email";
-			  $_SESSION['info'] = $info;
-			  $_SESSION['email'] = $email;
-		  
-			  exit();
-		  }
-		  
-      }
-        else
-        {
-          echo "<script>
-          Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: 'Something went wrong!',
-          });
-        </script>";
+    require_once SNEAKERPEAK_ROOT . '/src/App/Models/UserModel.php';
+    $name = trim((string) ($_POST['name'] ?? ''));
+    $email = trim((string) ($_POST['email'] ?? ''));
+    $password = (string) ($_POST['password'] ?? '');
+    if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)
+        || $password !== ($_POST['cpassword'] ?? null) || strlen($password) < 8
+        || !\SneakerPeak\App\Services\AuthService::canHash($password)) {
+        $message = 'Enter a name, valid email and matching passwords.';
+    } else {
+        $conn->begin_transaction();
+        try {
+            $conn->execute_query('INSERT INTO T_User (DisplayName, Email, EmailKey, PasswordHash, IsAdmin, EmailVerified)
+                VALUES (?, ?, ?, ?, 1, 1)', [$name, $email, \SneakerPeak\App\Models\UserModel::emailKey($email), password_hash($password, PASSWORD_DEFAULT)]);
+            $id = $conn->insert_id;
+            $conn->execute_query('INSERT INTO T_Admin (UserId, AdminFlag, GrantedDate, GrantedByUserId) VALUES (?, 1, UTC_TIMESTAMP(6), ?)',
+                [$id, $_SESSION['AdminID']]);
+            $conn->commit();
+            $message = 'Admin added.';
+        } catch (Throwable $error) {
+            $conn->rollback();
+            $message = $error->getCode() === 1062 ? 'This email already exists.' : 'Could not add admin.';
         }
-    }
-}
-
-?>
-
+    } ?>
+    <script>Swal.fire({title: <?= json_encode($message, JSON_HEX_TAG) ?>});</script>
+<?php } ?>
 </body>
 </html>

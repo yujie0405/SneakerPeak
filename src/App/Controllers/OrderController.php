@@ -34,7 +34,7 @@ $all = $shipping + (float) $row['Order_TotalAmmount'];
 $method = $row['Payment_Type'];
 $Ordercode = $orderCode;
 if ($invoice) {
-    $contact = $conn->prepare('SELECT name, email, Customer_ContractNumber FROM customer WHERE id = ?');
+    $contact = $conn->prepare('SELECT DisplayName AS name, Email AS email, Phone AS Customer_ContractNumber FROM T_User WHERE Id = ?');
     $contact->execute([$customer]);
     $roll = $contact->get_result()->fetch_assoc();
     require SNEAKERPEAK_ROOT . '/resources/views/account/invoice.php';

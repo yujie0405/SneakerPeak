@@ -23,11 +23,11 @@ final class CheckoutService
         $shipping = $subtotal >= 50000 ? 0 : 2000;
         $value = (float) ($promotion['Value'] ?? 0);
         $discount = match ($promotion['Promote_type'] ?? null) {
-            'Value Off' => (int) round(100 * $value),
-            'Percentage Off' => (int) round($subtotal * $value / 100),
+            'FIXED' => (int) round(100 * $value),
+            'PERCENTAGE' => (int) round($subtotal * $value / 100),
             default => 0,
         };
-        if (($promotion['Promote_type'] ?? null) === 'Free Shipping') {
+        if (($promotion['Promote_type'] ?? null) === 'FREE_SHIPPING') {
             $shipping = 0;
         }
         $discount = min($subtotal, max(0, $discount));
@@ -44,7 +44,7 @@ final class CheckoutService
     {
         $connection->begin_transaction();
         try {
-            $lock = $connection->prepare('SELECT id FROM customer WHERE id = ? FOR UPDATE');
+            $lock = $connection->prepare('SELECT Id FROM T_User WHERE Id = ? AND IsAdmin = 0 AND IsActive = 1 FOR UPDATE');
             $lock->execute([$customerId]);
             if (!$lock->get_result()->fetch_row()) {
                 throw new DomainException('Please sign in to continue.');
@@ -55,11 +55,10 @@ final class CheckoutService
             }
 
             $inventory = $connection->prepare(
-                "SELECT Prod_Qty FROM sizeandqty WHERE Prod_Name = ? AND Prod_Size = ?
-                 AND Qty_status = 'Available'"
+                "SELECT Qty AS Prod_Qty FROM T_ProductSizeAndCategory WHERE ProductId = ? AND SizeId = ? AND IsAvailable = 1"
             );
             foreach ($items as $item) {
-                $inventory->execute([$item['Product_Name'], $item['Select_Size']]);
+                $inventory->execute([$item['ProductId'], $item['SizeId']]);
                 $stock = $inventory->get_result()->fetch_assoc();
                 if ($item['Current_Price'] === null || (int) $item['Select_qty'] < 1
                     || (int) $item['Select_qty'] > (int) ($stock['Prod_Qty'] ?? 0)) {
@@ -72,26 +71,27 @@ final class CheckoutService
                 throw new DomainException('The promotion code is no longer available.');
             }
             $quote = self::quote($items, $promotion);
-            $date = date('d/m/Y');
-            $codeCheck = $connection->prepare('SELECT ID FROM oder WHERE Order_code = ?');
+            $date = date('Y-m-d');
+            $codeCheck = $connection->prepare('SELECT Id FROM T_Order WHERE OrderCode = ?');
             do {
                 $orderCode = (string) random_int(100000, 999999);
                 $codeCheck->execute([$orderCode]);
             } while ($codeCheck->get_result()->fetch_row());
 
             $order = $connection->prepare(
-                "INSERT INTO oder
-                 (UID, Order_code, Order_Date, Order_TotalAmmount, ShippingFeed, Payment_Type, Payment_Status, Order_Status, Promote_Code, ask)
-                 VALUES (?, ?, ?, ?, ?, 'unset', 'Paying', 'Pending', ?, '0')"
+                "INSERT INTO T_Order
+                 (UserId, OrderCode, OrderedOn, NetItemsAmount, ShippingFee, PaymentType, PaymentStatus, OrderStatus, PromotecodeId, PromotionCodeSnapshot)
+                 VALUES (?, ?, ?, ?, ?, 'unset', 'Paying', 'Pending', ?, ?)"
             );
-            $order->execute([$customerId, $orderCode, $date, $quote['total'] - $quote['shipping'], $quote['shipping'], $promotionCode]);
+            $order->execute([$customerId, $orderCode, $date, $quote['total'] - $quote['shipping'], $quote['shipping'], $promotion['Id'] ?? null, $promotion['Code'] ?? null]);
+            $orderId = $connection->insert_id;
             $line = $connection->prepare(
-                'INSERT INTO oder_details (UID, Order_code, Order_Product, Order_ProdcutP, Order_Size, Order_qty, Order_Day)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)'
+                'INSERT INTO T_OrderLineItem (OrderId, ProductId, SizeId, ProductNameSnapshot, UnitPrice, SizeLabelSnapshot, Qty, RecordedOn)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
             );
             foreach ($items as $item) {
                 $line->execute([
-                    $customerId, $orderCode, $item['Product_Name'], $item['Current_Price'],
+                    $orderId, $item['ProductId'], $item['SizeId'], $item['Product_Name'], $item['Current_Price'],
                     $item['Select_Size'], $item['Select_qty'], $date,
                 ]);
             }
@@ -108,7 +108,7 @@ final class CheckoutService
         $connection->begin_transaction();
         try {
             $order = $connection->prepare(
-                'SELECT Payment_Status, Payment_Type FROM oder WHERE UID = ? AND Order_code = ? FOR UPDATE'
+                'SELECT Id, PaymentStatus AS Payment_Status, PaymentType AS Payment_Type FROM T_Order WHERE UserId = ? AND OrderCode = ? FOR UPDATE'
             );
             $order->execute([$customerId, $orderCode]);
             $current = $order->get_result()->fetch_assoc();
@@ -124,38 +124,34 @@ final class CheckoutService
             }
 
             $lines = $connection->prepare(
-                'SELECT Order_Product, Order_Size, Order_qty FROM oder_details
-                 WHERE UID = ? AND Order_code = ? ORDER BY Order_Product, Order_Size'
+                'SELECT ProductId, SizeId, Qty AS Order_qty FROM T_OrderLineItem WHERE OrderId = ? ORDER BY ProductId, SizeId'
             );
-            $lines->execute([$customerId, $orderCode]);
+            $lines->execute([$current['Id']]);
             $items = $lines->get_result()->fetch_all(MYSQLI_ASSOC);
             if (!$items) {
                 throw new DomainException('The order has no items.');
             }
 
             $stock = $connection->prepare(
-                "UPDATE sizeandqty
-                 SET Qty_status = CASE WHEN CAST(Prod_Qty AS SIGNED) = ? THEN 'UnAvailable' ELSE Qty_status END,
-                     Prod_Qty = CAST(Prod_Qty AS SIGNED) - ?
-                 WHERE Prod_Name = ? AND Prod_Size = ? AND Qty_status = 'Available'
-                   AND CAST(Prod_Qty AS SIGNED) >= ?"
+                "UPDATE T_ProductSizeAndCategory SET IsAvailable = IF(Qty = ?, 0, IsAvailable), Qty = Qty - ?
+                 WHERE ProductId = ? AND SizeId = ? AND IsAvailable = 1 AND Qty >= ?"
             );
             $cart = $connection->prepare(
-                'DELETE FROM cart WHERE UID = ? AND Product_Name = ? AND Select_Size = ? AND Select_qty = ?'
+                'DELETE FROM T_Cart WHERE UserId = ? AND ProductId = ? AND SizeId = ? AND Qty = ?'
             );
             foreach ($items as $item) {
                 $quantity = (int) $item['Order_qty'];
                 if ($quantity < 1) {
                     throw new DomainException('The order contains an invalid quantity.');
                 }
-                $stock->execute([$quantity, $quantity, $item['Order_Product'], $item['Order_Size'], $quantity]);
+                $stock->execute([$quantity, $quantity, $item['ProductId'], $item['SizeId'], $quantity]);
                 if ($stock->affected_rows !== 1) {
                     throw new DomainException('An item is no longer available in the requested quantity.');
                 }
-                $cart->execute([$customerId, $item['Order_Product'], $item['Order_Size'], $quantity]);
+                $cart->execute([$customerId, $item['ProductId'], $item['SizeId'], $quantity]);
             }
 
-            $update = $connection->prepare("UPDATE oder SET Payment_Status = 'Complete' WHERE UID = ? AND Order_code = ?");
+            $update = $connection->prepare("UPDATE T_Order SET PaymentStatus = 'Complete' WHERE UserId = ? AND OrderCode = ?");
             $update->execute([$customerId, $orderCode]);
             $connection->commit();
         } catch (Throwable $error) {

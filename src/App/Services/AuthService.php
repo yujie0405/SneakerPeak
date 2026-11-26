@@ -6,11 +6,9 @@ use mysqli;
 
 final class AuthService
 {
-    public static function verify(string $password, string $stored): bool
+    public static function verify(string $password, ?string $stored): bool
     {
-        return password_get_info($stored)['algo'] === null
-            ? hash_equals($stored, $password)
-            : password_verify($password, $stored);
+        return $stored !== null && password_verify($password, $stored);
     }
 
     public static function canHash(string $password): bool
@@ -23,8 +21,7 @@ final class AuthService
         if (!self::canHash($new)) {
             return false;
         }
-        $table = $role === 'admin' ? 'admin' : 'customer';
-        $statement = $connection->prepare("UPDATE `$table` SET password = ? WHERE id = ? AND BINARY password = ?");
+        $statement = $connection->prepare("UPDATE T_User SET PasswordHash = ? WHERE Id = ? AND IsActive = 1 AND BINARY PasswordHash = ?");
         $statement->execute([password_hash($new, PASSWORD_DEFAULT), $id, $stored]);
         return $statement->affected_rows === 1;
     }
@@ -35,8 +32,7 @@ final class AuthService
         if ($new !== $confirmation || strlen($new) < 8) {
             return false;
         }
-        $table = $role === 'admin' ? 'admin' : 'customer';
-        $statement = $connection->prepare("SELECT password FROM `$table` WHERE id = ?");
+        $statement = $connection->prepare("SELECT PasswordHash FROM T_User WHERE Id = ? AND IsActive = 1");
         $statement->execute([$id]);
         $stored = $statement->get_result()->fetch_row()[0] ?? null;
         return $stored !== null && self::verify($old, $stored)

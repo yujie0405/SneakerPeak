@@ -5,6 +5,8 @@ use SneakerPeak\App\Services\AuthService;
 require SNEAKERPEAK_ROOT . '/database/config.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/AuthService.php';
 
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/UserModel.php';
+use SneakerPeak\App\Models\UserModel;
 $table = $isAdmin ? 'admin' : 'customer';
 $profileId = (string) $_SESSION[$isAdmin ? 'AdminID' : 'CustomerID'];
 $profileUrl = $isAdmin ? 'admin_profile.php' : 'profile_1.php';
@@ -36,16 +38,17 @@ if ($save || $change || $upload) {
             if ($name === '') {
                 throw new DomainException('Enter your name.');
             }
-            if ($isAdmin) {
-                $update = $conn->prepare('UPDATE admin SET name = ?, Admin_ContactNumber = ? WHERE id = ?');
-                $update->execute([$name, $phone, $profileId]);
-            } else {
-                $update = $conn->prepare(
-                    'UPDATE customer SET name = ?, Customer_Address = ?, Customer_Address_2 = ?, Customer_ContractNumber = ? WHERE id = ?'
-                );
-                $update->execute([
-                    $name, (string) ($_POST['cus_address'] ?? ''), (string) ($_POST['cus_address_2'] ?? ''), $phone, $profileId,
-                ]);
+            $conn->begin_transaction();
+            try {
+                $conn->execute_query('UPDATE T_User SET DisplayName = ?, Phone = ? WHERE Id = ?', [$name, $phone, $profileId]);
+                if (!$isAdmin) {
+                    UserModel::saveAddress($conn, $profileId, 1, (string) ($_POST['cus_address'] ?? ''));
+                    UserModel::saveAddress($conn, $profileId, 2, (string) ($_POST['cus_address_2'] ?? ''));
+                }
+                $conn->commit();
+            } catch (Throwable $error) {
+                $conn->rollback();
+                throw $error;
             }
             $_SESSION['name'] = $name;
             $_SESSION['profile_message'] = 'Your information has been updated.';
@@ -72,7 +75,7 @@ if ($save || $change || $upload) {
                 throw new DomainException('The image could not be saved.');
             }
             try {
-                $update = $conn->prepare("UPDATE `$table` SET image = ? WHERE id = ?");
+                $update = $conn->prepare("UPDATE T_User SET ProfileImage = ? WHERE Id = ?");
                 $update->execute([$filename, $profileId]);
             } catch (Throwable $error) {
                 unlink($destination);
@@ -90,11 +93,10 @@ if ($save || $change || $upload) {
     }
 }
 
-$contactField = $isAdmin ? 'Admin_ContactNumber' : 'Customer_ContractNumber';
-$addressFields = $isAdmin ? '' : ', Customer_Address, Customer_Address_2';
-$statement = $conn->prepare("SELECT id, name, email, image, `$contactField` $addressFields FROM `$table` WHERE id = ?");
-$statement->execute([$profileId]);
-$profile = $statement->get_result()->fetch_assoc();
+$profile = $conn->execute_query(
+    "SELECT Id AS id, DisplayName AS name, Email AS email, COALESCE(ProfileImage,'noprofil.jpg') AS image, Phone FROM T_User WHERE Id = ?",
+    [$profileId]
+)->fetch_assoc();
 if (!$profile) {
     header('Location: Logout.php');
     exit;
@@ -104,14 +106,14 @@ if ($isAdmin) {
     $admin = $profile;
     $admin_name = $profile['name'];
     $admin_email = $profile['email'];
-    $admin_phone = $profile[$contactField];
+    $admin_phone = ($profile['Phone'] ?? '');
     require SNEAKERPEAK_ROOT . '/resources/views/admin/admin_profile.php';
 } else {
     $user = $profile;
     $cus_name = $profile['name'];
     $cus_email = $profile['email'];
-    $cus_phone = $profile[$contactField];
-    $cus_address = $profile['Customer_Address'];
-    $cus_address2 = $profile['Customer_Address_2'];
+    $cus_phone = ($profile['Phone'] ?? '');
+    $cus_address = UserModel::address($conn, $profileId, 1);
+    $cus_address2 = UserModel::address($conn, $profileId, 2);
     require SNEAKERPEAK_ROOT . '/resources/views/account/profile_1.php';
 }

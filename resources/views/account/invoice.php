@@ -168,9 +168,10 @@
 
 								<td>
                   TO:<br />
-									<?php echo $roll['name'] ?><br />
-									<?php echo $roll['email'] ?><br/>
-									<?php echo $roll['Customer_ContractNumber'] ?>
+									<?= htmlspecialchars($row['Receiver_Name'] ?? $roll['name'] ?? '') ?><br />
+									<?= htmlspecialchars($roll['email'] ?? '') ?><br/>
+									<?= htmlspecialchars($row['Receiver_Contract'] ?? $roll['Customer_ContractNumber'] ?? '') ?><br />
+                                    <?= htmlspecialchars($row['Order_Address'] ?? '') ?>
 								</td>
 							</tr>
 						</table>

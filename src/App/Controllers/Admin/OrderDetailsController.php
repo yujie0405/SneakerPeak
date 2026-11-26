@@ -1,9 +1,10 @@
 <?php
 
 require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/OrderModel.php';
 
 $orderCode = (string) ($_GET['orderCode'] ?? '');
-$order = $conn->prepare('SELECT * FROM oder WHERE Order_code = ? LIMIT 1');
+$order = $conn->prepare('SELECT ' . \SneakerPeak\App\Models\OrderModel::FIELDS . ' FROM T_Order WHERE OrderCode = ?');
 $order->execute([$orderCode]);
 $cal = $order->get_result()->fetch_assoc();
 if (!$cal) {
@@ -11,15 +12,13 @@ if (!$cal) {
     exit('Order not found.');
 }
 $token = $_SESSION['order_admin_token'] ??= bin2hex(random_bytes(32));
-$address = $conn->prepare('SELECT * FROM oder_address WHERE UID = ? AND Order_code = ? ORDER BY ID DESC LIMIT 1');
-$address->execute([$cal['UID'], $orderCode]);
-$call = $address->get_result()->fetch_assoc() ?? [];
+$call = $cal;
 $lines = $conn->prepare(
-    'SELECT d.*, p.Prod_img1 FROM oder_details d
-     LEFT JOIN product p ON d.Order_Product = p.Prod_Name
-     WHERE d.UID = ? AND d.Order_code = ? ORDER BY d.ID'
+    'SELECT d.ProductNameSnapshot AS Order_Product, d.SizeLabelSnapshot AS Order_Size,
+       d.UnitPrice AS Order_ProdcutP, d.Qty AS Order_qty, p.Image1Path AS Prod_img1
+     FROM T_OrderLineItem d LEFT JOIN T_Product p ON d.ProductId = p.Id WHERE d.OrderId = ? ORDER BY d.Id'
 );
-$lines->execute([$cal['UID'], $orderCode]);
+$lines->execute([$cal['ID']]);
 $orderItems = $lines->get_result()->fetch_all(MYSQLI_ASSOC);
 
 require SNEAKERPEAK_ROOT . '/resources/views/admin/admin_Orderdetails.php';

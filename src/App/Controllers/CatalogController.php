@@ -7,14 +7,14 @@ require SNEAKERPEAK_ROOT . '/database/config.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/ProductModel.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/WishlistModel.php';
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 $customer = (string) ($_SESSION['CustomerID'] ?? '');
 $filters = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET;
 $search = is_string($filters['search'] ?? null) ? trim($filters['search']) : '';
 $categories = ['Male', 'Female', 'Kid'];
 $category = in_array($filters['Cate'] ?? null, $categories, true) ? $filters['Cate'] : '';
-$brandRows = $conn->query('SELECT Brand_Name FROM brand')->fetch_all(MYSQLI_ASSOC);
-$subcategoryRows = $conn->query('SELECT S_Name FROM sub_category')->fetch_all(MYSQLI_ASSOC);
+$brandRows = $conn->query('SELECT Name AS Brand_Name FROM E_Brand')->fetch_all(MYSQLI_ASSOC);
+$subcategoryRows = $conn->query('SELECT Name AS S_Name FROM E_SubCategory')->fetch_all(MYSQLI_ASSOC);
 $brandOptions = array_unique(array_map('trim', array_column($brandRows, 'Brand_Name')));
 $subcategoryOptions = array_unique(array_map('trim', array_column($subcategoryRows, 'S_Name')));
 $selected = static fn($values) => array_map('trim', array_filter((array) $values, 'is_string'));

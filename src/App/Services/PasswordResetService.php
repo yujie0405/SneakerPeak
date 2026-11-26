@@ -2,29 +2,29 @@
 
 namespace SneakerPeak\App\Services;
 
-use mysqli;
-
 require_once __DIR__ . '/EmailService.php';
 
 final class PasswordResetService
 {
-    public static function issue(mysqli $connection, array $account, string $purpose): bool
+    public static function issue(array $account, string $purpose): bool
     {
         $code = random_int(100000, 999999);
         $subject = $purpose === 'reset' ? 'Password reset code' : 'Email verification code';
-        $statement = $connection->prepare('UPDATE customer SET code = ? WHERE id = ?');
-        $statement->execute([$code, $account['id']]);
+        if (($_SESSION['otp_issued_at'] ?? 0) > time() - 30) return false;
+        $_SESSION['otp_issued_at'] = time();
         if (!EmailService::send($account['email'], $subject, "Your SneakerPeak code is $code. It expires in 10 minutes.")) {
             return false;
         }
         $_SESSION['otp'] = [
-            'id' => $account['id'], 'purpose' => $purpose,
+            'id' => (string) $account['id'], 'email' => $account['email'], 'purpose' => $purpose,
+            'hash' => password_hash((string) $code, PASSWORD_DEFAULT),
+            'password' => $account['password'] ?? null,
             'expires' => time() + 600, 'attempts' => 0,
         ];
         return true;
     }
 
-    public static function verify(mysqli $connection, string $purpose, string $code): ?array
+    public static function verify(string $purpose, string $code): ?array
     {
         $attempt = $_SESSION['otp'] ?? [];
         if (($attempt['purpose'] ?? null) !== $purpose
@@ -35,12 +35,11 @@ final class PasswordResetService
         if (!preg_match('/^\d{6}$/D', $code)) {
             return null;
         }
-        $statement = $connection->prepare('SELECT id FROM customer WHERE id = ? AND code = ?');
-        $statement->execute([$attempt['id'], $code]);
-        if (!$statement->get_result()->fetch_row()) {
+        if (empty($attempt['hash']) || !password_verify($code, $attempt['hash'])) {
             return null;
         }
         unset($_SESSION['otp']);
-        return $attempt + ['code' => $code];
+        unset($attempt['hash']);
+        return $attempt;
     }
 }

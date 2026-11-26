@@ -130,22 +130,22 @@
 					?>
     			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
     				<div class="product d-flex flex-column">
-    					<a  class="img-prod"><img class="img-fluid" src="prod/<?php echo $row['Prod_img1']?>" alt="Colorlib Template">
+                            <a  class="img-prod"><img class="img-fluid" src="prod/<?php echo rawurlencode($row['Prod_img1'] ?? '')?>" alt="Colorlib Template">
     						<div class="overlay"></div>
     					</a>
     					<div class="text py-3 pb-4 px-3">
     						<div class="d-flex">
     							<div class="cat">
-		    						<span><?php echo $row['Prod_SubC']?></span>
+                            <span><?php echo htmlspecialchars($row['Prod_SubC'])?></span>
 		    					</div>
 	    					</div>
-    						<h3><a href="#"><?php echo $row['Prod_Name']?></a></h3>
+                            <h3><a href="#"><?php echo htmlspecialchars($row['Prod_Name'])?></a></h3>
     						<div class="pricing">
-	    						<p class="price"><span>RM<?php echo $row['Prod_Price']?></span></p>
+                            <p class="price"><span>RM<?php echo $row['Prod_Price']?></span></p>
 	    					</div>
 	    					<p class="bottom-area d-flex px-3">
-    							<a href="prod.php?Prod_Name=<?php  echo $row ['Prod_Name']; ?>" target="_self"  class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-    							<a href="index.php?add=<?php echo $row ['Prod_Name'];?>" class="buy-now text-center py-2">Wishlist <span><i class="fa-regular fa-heart"></i></span></a>
+                            <a href="prod.php?Prod_Name=<?php  echo rawurlencode($row['Prod_Name']); ?>" target="_self"  class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+                            <a href="index.php?add=<?php echo rawurlencode($row['Prod_Name']);?>" class="buy-now text-center py-2">Wishlist <span><i class="fa-regular fa-heart"></i></span></a>
     						</p>
     					</div>
     				</div>

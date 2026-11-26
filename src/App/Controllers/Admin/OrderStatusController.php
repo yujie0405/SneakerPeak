@@ -16,8 +16,8 @@ $path = strtolower(basename((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_
 $markShipped = $path === 'changestatus.php';
 $orderCode = (string) ($_POST['orderCode'] ?? '');
 $sql = $markShipped
-    ? "UPDATE oder SET Order_Status = 'Shipped' WHERE Order_code = ? AND Order_Status = 'Pending' AND Payment_Status = 'Complete'"
-    : "UPDATE oder SET ask = 1 WHERE Order_code = ? AND Order_Status IN ('Shipping', 'Shipped') AND ask = '0'";
+    ? "UPDATE T_Order SET OrderStatus = 'Shipped' WHERE OrderCode = ? AND OrderStatus = 'Pending' AND PaymentStatus = 'Complete'"
+    : "UPDATE T_Order SET ConfirmationRequested = 1 WHERE OrderCode = ? AND OrderStatus IN ('Shipping', 'Shipped') AND ConfirmationRequested = 0";
 $update = $conn->prepare($sql);
 $update->execute([$orderCode]);
 if (!$update->affected_rows) {
@@ -25,7 +25,7 @@ if (!$update->affected_rows) {
     exit('This order cannot move to the requested status.');
 }
 
-$lookup = $conn->prepare('SELECT c.email FROM customer c JOIN oder o ON c.id = o.UID WHERE o.Order_code = ? LIMIT 1');
+$lookup = $conn->prepare('SELECT u.Email FROM T_User u JOIN T_Order o ON u.Id = o.UserId WHERE o.OrderCode = ?');
 $lookup->execute([$orderCode]);
 $email = (string) ($lookup->get_result()->fetch_row()[0] ?? '');
 $subject = $markShipped ? 'Order shipped' : 'Confirm order completion';

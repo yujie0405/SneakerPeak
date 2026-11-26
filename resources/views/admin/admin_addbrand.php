@@ -61,7 +61,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
                 </thead>
                 <tbody>
                   <?php
-                    $query = "select * from brand";
+                    $query = "SELECT Name AS Brand_Name, LogoPath AS Brand_logo FROM E_Brand";
                     $result = mysqli_query($conn,$query);
                     while($row = mysqli_fetch_assoc($result)){
 
@@ -122,7 +122,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
               </thead>
               <tbody>
               <?php
-                    $query = "select * from sub_category";
+                    $query = "SELECT Name AS S_Name FROM E_SubCategory";
                     $result = mysqli_query($conn,$query);
                     while($row = mysqli_fetch_assoc($result)){
 
@@ -146,124 +146,27 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
   </section>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <?php
-    if (isset($_POST['ADD'])) {
-      $B_Name = $_POST['brand_Name'];
-  
-      // Check if the brand name already exists
-      $check_query = mysqli_query($conn, "SELECT Brand_Name FROM brand WHERE Brand_Name = '$B_Name'");
-      if (mysqli_num_rows($check_query) > 0) {
-          // Brand name already exists
-          ?>
-          <script>
-             Swal.fire({
-              title: 'Error',
-              text: "The Brand You Enter Already Exist!",
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                Swal.fire(
-                  'Deleted!',
-                  'Your Brand has been deleted.',
-                  'success'
-                )
-              }
-            })
-          </script>
-          <?php
-      } else {
-          $B_logo = $_FILES['logo_img']['name'];
-          $B_logo_tmp = $_FILES['logo_img']['tmp_name'];
-  
-          $img_upload_path = SNEAKERPEAK_ASSETS . '/image/logo/';
-  
-          move_uploaded_file($B_logo_tmp, $img_upload_path . $B_logo);
-  
-          $brand = mysqli_query($conn, "INSERT INTO brand (Brand_Name, Brand_logo) VALUES ('$B_Name', '$B_logo')");
-          if ($brand) {
-            ?>
-              <script>
-                   Swal.fire({
-                position: 'center',
-                icon: 'success',
-                title: 'The Brand Had Been Added',
-                showConfirmButton: false,
-                timer: 1500
-                }).then(() => {
-                    window.location = "admin_addbrand.php";
-                });
-              </script>
-              
-            <?php
-          } 
-      }
-  }
-  
-
-  ?>
-  <?php
-  if (isset($_POST['ADD_SUB'])) {
-  $S_C = $_POST['Sub_Category'];
-
-  // Check if the subcategory already exists
-  $existingSubCategoryQuery = "SELECT * FROM sub_category WHERE S_Name = '$S_C'";
-  $existingSubCategoryResult = mysqli_query($conn, $existingSubCategoryQuery);
-
-  if (mysqli_num_rows($existingSubCategoryResult) > 0) {
-    ?>
-      
-     
-      <script>
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Something went wrong! The Sub Category Your Enter Already Exist',
-         
-        })
-      </script>
-      <?php 
-  } else {
-   
-      // Subcategory does not exist, proceed with insertion
-      $sc = mysqli_query($conn, "INSERT INTO sub_category(S_Name) VALUES ('$S_C')");
-      ?>
-     
-    
-    <script>
-        Swal.fire({
-                position: 'center',
-                icon: 'success',
-                title: 'The SubCategory Add Sucessfully',
-                showConfirmButton: false,
-                timer: 1500
-            }).then(() => {
-                window.location = "admin_addbrand.php";
-            });
-      </script>
-     <?php 
-  }
-}
-
-?>
-
-
-  <script>
-  let arrow = document.querySelectorAll(".arrow");
-  for (var i = 0; i < arrow.length; i++) {
-    arrow[i].addEventListener("click", (e)=>{
-   let arrowParent = e.target.parentElement.parentElement;//selecting main parent of arrow
-   arrowParent.classList.toggle("showMenu");
-    });
-  }
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".bx-menu");
-  console.log(sidebarBtn);
-  sidebarBtn.addEventListener("click", ()=>{
-    sidebar.classList.toggle("close");
-  });
-  </script>
+if (isset($_POST['ADD']) || isset($_POST['ADD_SUB'])) {
+    require_once SNEAKERPEAK_ROOT . '/src/App/Services/CatalogImageUpload.php';
+    $isBrand = isset($_POST['ADD']);
+    $label = trim((string) ($_POST[$isBrand ? 'brand_Name' : 'Sub_Category'] ?? ''));
+    $directory = SNEAKERPEAK_ASSETS . '/image/logo/';
+    $logo = null;
+    try {
+        if ($label === '') throw new DomainException('Enter a name.');
+        if ($isBrand) {
+            $logo = \SneakerPeak\App\Services\CatalogImageUpload::save($_FILES['logo_img'] ?? [], $directory);
+            $conn->execute_query('INSERT INTO E_Brand (Name, LogoPath) VALUES (?, ?)', [$label, $logo]);
+        } else {
+            $conn->execute_query('INSERT INTO E_SubCategory (Name) VALUES (?)', [$label]);
+        }
+        $message = $isBrand ? 'Brand added.' : 'Subcategory added.';
+    } catch (Throwable $error) {
+        if ($logo !== null) unlink($directory . $logo);
+        $message = $error instanceof DomainException ? $error->getMessage()
+            : ($error->getCode() === 1062 ? 'That name already exists.' : 'Could not save the entry.');
+    } ?>
+    <script>Swal.fire({title: <?= json_encode($message, JSON_HEX_TAG) ?>});</script>
+<?php } ?>
 </body>
 </html>

@@ -1,31 +1,15 @@
 <?php
-include SNEAKERPEAK_ROOT . '/database/config.php';
-
-$status = isset($_GET['status']) ? $_GET['status'] : '';
-$brand = isset($_GET['brand']) ? $_GET['brand'] : '';
-$search = isset($_GET['search']) ? $_GET['search'] : '';
-
-$where_clause = '';
-if ($status != '') {
-    $where_clause .= " WHERE Prod_Status = '$status'";
-}
-if ($brand != '') {
-    if ($where_clause == '') {
-        $where_clause .= " WHERE Prod_Brand = '$brand'";
-    } else {
-        $where_clause .= " AND Prod_Brand = '$brand'";
-    }
-}
-if ($search != '') {
-    if ($where_clause == '') {
-        $where_clause .= " WHERE Prod_Name LIKE '%$search%'";
-    } else {
-        $where_clause .= " AND Prod_Name LIKE '%$search%'";
-    }
-}
-
-$query = "SELECT * FROM product" . $where_clause;
-$result = mysqli_query($conn,$query);
+require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/ProductModel.php';
+$projection = \SneakerPeak\App\Models\ProductModel::CATALOG;
+$status = (string) ($_GET['status'] ?? '');
+$brand = (string) ($_GET['brand'] ?? '');
+$search = (string) ($_GET['search'] ?? '');
+$result = $conn->execute_query(
+    "SELECT * FROM ($projection) catalog WHERE (? = '' OR Prod_Status = ?)
+     AND (? = '' OR Prod_Brand = ?) AND (? = '' OR Prod_Name LIKE CONCAT('%', ?, '%'))",
+    [$status, $status, $brand, $brand, $search, $search]
+);
 ?>
 
 <!DOCTYPE html>
