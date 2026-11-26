@@ -77,6 +77,202 @@ The current schema is defined in [database/proposed-schema.sql](database/propose
 | `T_Order` | Order totals, payment and fulfilment status, and the shipping address saved at checkout. |
 | `T_OrderLineItem` | Purchased products, sizes, quantities, and prices as recorded when the order was created. |
 
+## Database column reference
+
+These definitions follow `database/proposed-schema.sql`. `VARCHAR(n)` holds up to `n` characters, `TEXT` holds longer text, `UNSIGNED` limits integers to nonnegative values, and `BOOLEAN` stores true or false flags. `DECIMAL(13,2)` stores exact amounts with two decimal places. `DATE` stores a calendar date and `DATETIME(6)` includes time with microsecond precision.
+
+### Shared audit columns
+
+| Column | SQL type | Rules and purpose |
+| --- | --- | --- |
+| `CreatedDate` | `DATETIME(6)` | Required. Defaults to the insertion time. |
+| `AdjustedDate` | `DATETIME(6)` | Required. Defaults to the insertion time and updates automatically when a row changes. |
+
+### `T_User`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `DisplayName` | `VARCHAR(255)` | Required |
+| `Email` | `VARCHAR(255)` | Required |
+| `EmailKey` | `VARCHAR(255)` | Nullable, unique |
+| `PasswordHash` | `VARCHAR(255)` | Nullable |
+| `Phone` | `VARCHAR(255)` | Nullable |
+| `ProfileImage` | `VARCHAR(255)` | Nullable |
+| `IsAdmin` | `BOOLEAN` | Required, default `FALSE` |
+| `IsActive` | `BOOLEAN` | Required, default `TRUE` |
+| `EmailVerified` | `BOOLEAN` | Required, default `FALSE` |
+
+Unique combination: `Id` + `IsAdmin`.
+
+### `T_Admin`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `UserId` | `BIGINT UNSIGNED` | Required, unique, foreign key to `T_User(Id, IsAdmin)` |
+| `AdminFlag` | `BOOLEAN` | Required, default `TRUE`, foreign key to `T_User(Id, IsAdmin)`, `AdminFlag = 1` |
+| `GrantedDate` | `DATETIME(6)` | Nullable |
+| `GrantedByUserId` | `BIGINT UNSIGNED` | Nullable, foreign key to `T_User(Id)` |
+
+### `E_Brand`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `Name` | `VARCHAR(255)` | Required, unique |
+| `LogoPath` | `VARCHAR(255)` | Nullable |
+
+### `E_SubCategory`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `Name` | `VARCHAR(255)` | Required, unique |
+
+### `E_Category`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `Name` | `VARCHAR(255)` | Required, unique |
+
+### `E_Size`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `SizingSystem` | `VARCHAR(24)` | Required |
+| `SizeLabel` | `VARCHAR(32)` | Required |
+| `SortOrder` | `SMALLINT UNSIGNED` | Required, default `0` |
+
+Unique combination: `SizingSystem` + `SizeLabel`.
+
+### `E_ProductStatus`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `TINYINT UNSIGNED` | Primary key |
+| `Code` | `VARCHAR(24)` | Required, unique |
+
+### `T_Product`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `BrandId` | `BIGINT UNSIGNED` | Required, foreign key to `E_Brand(Id)` |
+| `SubCategoryId` | `BIGINT UNSIGNED` | Required, foreign key to `E_SubCategory(Id)` |
+| `CategoryId` | `BIGINT UNSIGNED` | Required, foreign key to `E_Category(Id)` |
+| `Name` | `VARCHAR(255)` | Required, unique |
+| `Price` | `DECIMAL(13,2)` | Required, `Price >= 0` |
+| `Colour` | `VARCHAR(255)` | Nullable |
+| `Details` | `TEXT` | Required |
+| `Image1Path` | `VARCHAR(255)` | Nullable |
+| `Image2Path` | `VARCHAR(255)` | Nullable |
+| `Image3Path` | `VARCHAR(255)` | Nullable |
+| `ProductStatusId` | `TINYINT UNSIGNED` | Required, foreign key to `E_ProductStatus(Id)` |
+
+### `T_ProductSizeAndCategory`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `ProductId` | `BIGINT UNSIGNED` | Required, foreign key to `T_Product(Id)` |
+| `SizeId` | `BIGINT UNSIGNED` | Required, foreign key to `E_Size(Id)` |
+| `Qty` | `INT UNSIGNED` | Required |
+| `IsAvailable` | `BOOLEAN` | Required |
+
+Unique combination: `ProductId` + `SizeId`.
+
+### `T_CustomerAddress`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `UserId` | `BIGINT UNSIGNED` | Required, foreign key to `T_User(Id)` |
+| `AddressSlot` | `TINYINT UNSIGNED` | Required, `AddressSlot > 0` |
+| `AddressText` | `VARCHAR(255)` | Required |
+| `RecipientName` | `VARCHAR(255)` | Nullable |
+| `RecipientPhone` | `VARCHAR(255)` | Nullable |
+
+Unique combination: `UserId` + `AddressSlot`.
+
+### `E_PromoteType`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `Code` | `VARCHAR(24)` | Required, unique |
+| `Name` | `VARCHAR(100)` | Required |
+
+### `T_Promotecode`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `Code` | `VARCHAR(255)` | Required, unique |
+| `TypeId` | `BIGINT UNSIGNED` | Required, foreign key to `E_PromoteType(Id)` |
+| `PromotionValue` | `DECIMAL(13,2)` | Required, `PromotionValue >= 0` |
+| `ExpiresOn` | `DATE` | Nullable |
+| `Details` | `VARCHAR(255)` | Required |
+| `IsActive` | `BOOLEAN` | Required |
+
+### `T_Order`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `UserId` | `BIGINT UNSIGNED` | Required, foreign key to `T_User(Id)` |
+| `OrderCode` | `VARCHAR(255)` | Required, unique |
+| `OrderedOn` | `DATE` | Nullable |
+| `NetItemsAmount` | `DECIMAL(13,2)` | Required |
+| `ShippingFee` | `DECIMAL(13,2)` | Required |
+| `CurrencyCode` | `CHAR(3)` | Required, default `'MYR'` |
+| `PaymentType` | `VARCHAR(32)` | Nullable |
+| `PaymentStatus` | `VARCHAR(24)` | Required |
+| `OrderStatus` | `VARCHAR(24)` | Required |
+| `ConfirmationRequested` | `BOOLEAN` | Required, default `FALSE` |
+| `PromotecodeId` | `BIGINT UNSIGNED` | Nullable, foreign key to `T_Promotecode(Id)` |
+| `PromotionCodeSnapshot` | `VARCHAR(255)` | Nullable |
+| `ShippingAddressSnapshot` | `VARCHAR(255)` | Nullable |
+| `ShippingRecipientSnapshot` | `VARCHAR(255)` | Nullable |
+| `ShippingPhoneSnapshot` | `VARCHAR(255)` | Nullable |
+
+### `T_OrderLineItem`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `OrderId` | `BIGINT UNSIGNED` | Required, foreign key to `T_Order(Id)` |
+| `ProductId` | `BIGINT UNSIGNED` | Nullable, foreign key to `T_Product(Id)` |
+| `SizeId` | `BIGINT UNSIGNED` | Nullable, foreign key to `E_Size(Id)` |
+| `ProductNameSnapshot` | `VARCHAR(255)` | Required |
+| `SizeLabelSnapshot` | `VARCHAR(255)` | Required |
+| `UnitPrice` | `DECIMAL(13,2)` | Required |
+| `Qty` | `INT UNSIGNED` | Required, `Qty > 0` |
+| `RecordedOn` | `DATE` | Nullable |
+
+### `T_Cart`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `UserId` | `BIGINT UNSIGNED` | Required, foreign key to `T_User(Id)` |
+| `ProductId` | `BIGINT UNSIGNED` | Required, foreign key to `T_ProductSizeAndCategory(ProductId, SizeId)` |
+| `SizeId` | `BIGINT UNSIGNED` | Required, foreign key to `T_ProductSizeAndCategory(ProductId, SizeId)` |
+| `Qty` | `INT UNSIGNED` | Required, `Qty > 0` |
+
+Unique combination: `UserId` + `ProductId` + `SizeId`.
+
+### `T_Wishlist`
+
+| Column | SQL type | Rules |
+| --- | --- | --- |
+| `Id` | `BIGINT UNSIGNED` | Primary key, auto-increment |
+| `UserId` | `BIGINT UNSIGNED` | Required, foreign key to `T_User(Id)` |
+| `ProductId` | `BIGINT UNSIGNED` | Required, foreign key to `T_Product(Id)` |
+
+Unique combination: `UserId` + `ProductId`.
 ## Project folder structure
 
 ```text
