@@ -40,13 +40,12 @@ $totalProducts = $customerId === null ? 0 : \SneakerPeak\App\Models\CartModel::c
         <div class="collapse navbar-collapse" id="ftco-nav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item active"><a href="index.php" class="nav-link">Home</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Catalog</a>
-                    <div class="dropdown-menu" aria-labelledby="dropdown04">
+                <li class="nav-item dropdown storefront-dropdown" data-storefront-dropdown>
+                    <button type="button" class="nav-link dropdown-toggle" id="catalog-dropdown-trigger" aria-controls="catalog-dropdown-menu" aria-expanded="false">Catalog</button>
+                    <div class="dropdown-menu" id="catalog-dropdown-menu" aria-labelledby="catalog-dropdown-trigger" hidden>
                         <a class="dropdown-item" href="menu.php">Shop</a>
                         <a class="dropdown-item" href="sizecar.php">Size Chart</a>
                         <a class="dropdown-item" href="cart.php">Cart</a>
-                        
                     </div>
                 </li>
                 <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
@@ -56,35 +55,28 @@ $totalProducts = $customerId === null ? 0 : \SneakerPeak\App\Models\CartModel::c
             </ul>
         </div>
     </div>
-    <ul class="navbar-nav ml-auto">
-    <?php if (isset($_SESSION['name'])) { ?>
-        <li class="nav-item dropdown">
-            <a class="nav-link" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa-solid fa-circle-user fa-2xl" style="color: #000000; margin-right: 50px; font-size: 12px;">
-                    <?= htmlspecialchars((string) $_SESSION['name']) ?>
-                </i>
-            </a>
-            <div class="dropdown-menu" aria-labelledby="dropdown04">
-                <a class="dropdown-item" href="profile_1.php">Profile</a>
-                <a class="dropdown-item" href="OrderHistory.php">Order History</a>
-                <a class="dropdown-item" href="#" onclick="confirmLogout()">Logout</a>
+    <ul class="navbar-nav ml-auto storefront-account">
+        <li class="nav-item dropdown storefront-dropdown" data-storefront-dropdown>
+            <button type="button" class="nav-link" id="account-dropdown-trigger" aria-label="Account" aria-controls="account-dropdown-menu" aria-expanded="false">
+                <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+                <?php if ($customerId !== null) { ?>
+                    <span><?= htmlspecialchars((string) ($_SESSION['name'] ?? 'Account')) ?></span>
+                <?php } ?>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" id="account-dropdown-menu" aria-labelledby="account-dropdown-trigger" hidden>
+                <?php if ($customerId !== null) { ?>
+                    <a class="dropdown-item" href="profile_1.php">Profile</a>
+                    <a class="dropdown-item" href="OrderHistory.php">Order History</a>
+                    <button type="button" class="dropdown-item" onclick="confirmLogout()">Logout</button>
+                <?php } else { ?>
+                    <a class="dropdown-item" href="Login.php">Login</a>
+                    <a class="dropdown-item" href="Register.php">Register</a>
+                <?php } ?>
             </div>
         </li>
-    <?php } else { ?>
-        <li class="nav-item dropdown">
-            <a class="nav-link" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa-solid fa-circle-user fa-2xl" style="color: #000000; margin-right: 80px; font-size: 18px;"></i>
-            </a>
-            <div class="dropdown-menu" aria-labelledby="dropdown04">
-                <a class="dropdown-item" href="Login.php">Login</a>
-                <a class="dropdown-item" href="Register.php">Register</a>
-            </div>
-        </li>
-    <?php } ?>
-</ul>
-
-</nav>
-    <!-- END nav -->
+    </ul>
+    </nav>
+    <script src="assets/js/storefront-dropdowns.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function confirmLogout() 

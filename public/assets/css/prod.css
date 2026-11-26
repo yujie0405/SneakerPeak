@@ -103,7 +103,7 @@ body{
     cursor: pointer;
 }
 .s-checkbox:checked + .s-label{
-    background-color: #001d49;
+    background-color: var(--color-primary);
     color: var(--color-surface);
 }
 .s-checkbox{
@@ -141,13 +141,13 @@ body{
     border-radius: 4px;
 }
 .product-button .buy-now-btn{
-    background-color: #0b0b49;
+    background-color: var(--color-primary);
     color: var(--color-surface);
 }
 
 .product-button .buy-now-btn:hover
 {
-    background-color: #0f0f6f;
+    background-color: var(--color-nav-hover);
 }
 
 .product-button .add-bag-btn{

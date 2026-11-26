@@ -39,8 +39,8 @@
 
 .cart-page table thead th
 {
-    color: white;
-    background: #0b0b49;
+    color: var(--color-surface);
+    background: var(--color-primary);
     padding: 6px 0;
     border: none;
 }
@@ -105,9 +105,13 @@ td img{
     padding-bottom: 10%;
 }
 .total-price table{
-    border-top: 3px solid #0b0b49;
+    border-top: 3px solid var(--color-primary);
     width: 100%;
     max-width: 400px;
+}
+.cart-total-row {
+    background-color: var(--color-primary);
+    color: var(--color-surface);
 }
 td:last-child{
     text-align: right;
@@ -125,6 +129,7 @@ td:last-child{
 }
 .buttoncheckout a
 {
+    color: var(--color-primary);
     padding-right: 10px;
    
     height: 50px;
@@ -139,8 +144,8 @@ td:last-child{
 
 .buttoncheckout input[type=submit]
 {
-    background: #0b0b49;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-surface);
     font-size: 25px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     height: 50px;
@@ -148,8 +153,69 @@ td:last-child{
     border-radius: 8px;
 }
 
-.buttoncheckout input[type=submit]:hover
-{
-    background-color: rgb(224, 224, 224);
-    color: #0b0b49;
+.cart-page button,
+.total-price input[type=submit].add,
+.buttoncheckout input[type=submit] {
+    background-color: var(--color-primary);
+    color: var(--color-surface);
+    border: 1px solid var(--color-primary);
+}
+
+.cart-page button {
+    border-radius: 4px;
+}
+
+.cart-page button:enabled:hover,
+.total-price input[type=submit].add:enabled:hover,
+.buttoncheckout input[type=submit]:enabled:hover {
+    background-color: var(--color-nav-hover);
+    color: var(--color-surface);
+}
+
+.buttoncheckout a:hover {
+    color: var(--color-nav-hover);
+    text-decoration: underline;
+}
+
+:is(.cart-page, .total-price, .checkout) :focus-visible,
+.cart-page:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+.cart-page table tbody td .minus:disabled,
+.buttoncheckout input[type=submit]:disabled {
+    background: var(--color-bg);
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    cursor: not-allowed;
+}
+
+@media (max-width: 767px) {
+    .cart-page {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .cart-page table {
+        min-width: 540px;
+    }
+
+    .buttoncheckout {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .buttoncheckout a {
+        width: auto;
+        height: auto;
+    }
+
+    .buttoncheckout input[type=submit] {
+        max-width: 100%;
+        font-size: clamp(1.125rem, 5vw, 1.5rem);
+    }
 }

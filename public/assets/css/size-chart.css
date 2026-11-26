@@ -1,0 +1,56 @@
+.size-chart {
+    padding-block: clamp(2rem, 6vw, 4rem);
+}
+
+.size-chart-group {
+    margin-block: 1.5rem 2.5rem;
+}
+
+.size-chart-group h2 {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    padding: .75rem 1rem;
+    background: var(--color-accent);
+    color: var(--color-primary);
+}
+
+.size-chart-scroll {
+    overflow-x: auto;
+    margin-block: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: .375rem;
+}
+
+.size-chart-scroll:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+.size-chart table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--color-text);
+    background: var(--color-surface);
+}
+
+.size-chart caption {
+    caption-side: top;
+    padding: .75rem 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.size-chart th,
+.size-chart td {
+    padding: .5rem clamp(.5rem, 2vw, 1rem);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.size-chart thead {
+    background: var(--color-primary);
+    color: var(--color-surface);
+}
+
+.size-chart tbody tr:nth-child(even) {
+    background: var(--color-bg);
+}

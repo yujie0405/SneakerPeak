@@ -20,6 +20,80 @@
   outline-color: var(--color-accent);
 }
 
+#ftco-navbar .navbar-nav > .nav-item > .nav-link {
+  line-height: 1.5;
+}
+
+#ftco-navbar .storefront-dropdown > button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+#ftco-navbar .storefront-dropdown > .dropdown-menu {
+  display: block;
+  top: 100%;
+  margin: 0;
+  background: var(--color-primary);
+}
+
+#ftco-navbar .storefront-dropdown > .dropdown-menu[hidden] {
+  display: none;
+}
+
+#ftco-navbar .storefront-dropdown .dropdown-item {
+  color: var(--color-surface);
+}
+
+#ftco-navbar .storefront-dropdown .dropdown-item:hover,
+#ftco-navbar .storefront-dropdown .dropdown-item:focus-visible {
+  color: var(--color-accent);
+  background: var(--color-nav-hover);
+}
+
+#ftco-navbar .storefront-dropdown :focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+#ftco-navbar .storefront-dropdown .dropdown-item:focus-visible {
+  outline-color: var(--color-accent);
+}
+
+#ftco-navbar .storefront-account {
+  padding-inline: 1rem;
+}
+
+#account-dropdown-trigger i {
+  font-size: 1.125rem;
+  vertical-align: middle;
+}
+
+@media (max-width: 991.98px) {
+  #ftco-navbar {
+    height: auto;
+    line-height: normal;
+    background: var(--color-primary) !important;
+  }
+
+  #ftco-navbar .navbar-brand,
+  #ftco-navbar .navbar-nav > .nav-item:not(.cta) > .nav-link,
+  #ftco-navbar .navbar-toggler {
+    color: var(--color-surface) !important;
+  }
+
+  #ftco-navbar .navbar-toggler:focus-visible {
+    outline: 2px solid var(--color-accent) !important;
+    outline-offset: 2px;
+  }
+
+  #ftco-navbar .storefront-account {
+    width: 100%;
+    padding: 0;
+  }
+}
+
 .owl-carousel.home-slider .slider-item .slider-text h1,
 .owl-carousel.home-slider .slider-item .slider-text p {
   color: var(--color-text);

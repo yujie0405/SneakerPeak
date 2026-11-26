@@ -1,53 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
-    <link rel="stylesheet" href="css/style.css">
-     
-    <link rel="stylesheet" href="css/flaticon.css">
-    <link rel="stylesheet" href="css/icomoon.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/ionicons.min.css">
-    <title>Size Chart</title>
-<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
-</head>
-<body>
-    <?php
-    include SNEAKERPEAK_ROOT . '/resources/views/partials/header.php';
+<?php
 
-    ?>
-    <br>
-    <br>
-    <br>
-    <hr>
-    <br>
-    <img src="image/size car.jpg" alt="">
-    <br>
-    <br>
-    <br>
-    <?php
-    include SNEAKERPEAK_ROOT . '/resources/views/partials/footer.php';
+session_start();
 
-    ?>
-    <script src="js/jquery.min.js"></script>
-  <script src="js/jquery-migrate-3.0.1.min.js"></script>
-  <script src="js/popper.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/jquery.easing.1.3.js"></script>
-  <script src="js/jquery.waypoints.min.js"></script>
-  <script src="js/jquery.stellar.min.js"></script>
-  <script src="js/owl.carousel.min.js"></script>
-  <script src="js/jquery.magnific-popup.min.js"></script>
-  <script src="js/aos.js"></script>
-  <script src="js/jquery.animateNumber.min.js"></script>
-  <script src="js/bootstrap-datepicker.js"></script>
-  <script src="js/scrollax.min.js"></script>
-  <?php if ($mapsKey = sneakerpeakSetting('MAPS_BROWSER_KEY')) { ?><script src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($mapsKey) ?>&sensor=false"></script><?php } ?>
-  <?php if (!empty($mapsKey)) { ?><script src="js/google-map.js"></script><?php } ?>
-  <script src="js/main.js"></script>
-</body>
-</html>
+$sizeGroups = [
+    'Nike, Jordan, Under Armour refer (US) size in Hoopsstation website.' => [
+        'MENS SIZE' => [
+            'US' => '6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|12|13|14',
+            'UK' => '5.5|6|6|6.5|7|7.5|8|8.5|9|9.5|10|11|12|13',
+            'EUR' => '38.5|39|40|40.5|41|42|42.5|43|44|44.5|45|46|47.5|48.5',
+            'CM' => '24|24.5|25|25.5|26|26.5|27|27.5|28|28.5|29|30|31|32',
+        ],
+        'WMNS SIZE' => [
+            'US' => '5|5.5|6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|12',
+            'UK' => '2.5|3|3.5|4|4.5|5|5.5|6|6.5|7|7.5|8|8.5|9.5',
+            'EUR' => '35.5|36|36.5|37.5|38|38.5|39|40|40.5|41|42|42.5|43|44.5',
+            'CM' => '22|22.5|23|23.5|24|24.5|25|25.5|26|26.5|27|27.5|28|29',
+        ],
+        'YOUTH SIZE' => [
+            'US' => '3.5|4|4.5|5|5.5|6|7',
+            'UK' => '3|3.5|4|4.5|5|5.5|6',
+            'EUR' => '35.5|36|36.5|37.5|38|38.5|39',
+            'CM' => '22.5|23|23.5|23.5|24|24|25',
+        ],
+        'TODDLER SIZE' => [
+            'US' => '1C|2C|3C|4C|5C|6C|7C|8C|9C|10C|11C|12C|1Y|2Y|3Y|4Y|4.5Y|5Y|5.5Y',
+            'UK' => '0.5|1.5|2.5|3.5|4.5|5.5|6.5|7.5|8.5|9.5|10.5|11.5|13.5|1.5|2.5|3.5|4|4.5|5',
+            'EUR' => '16|17|18.5|19.5|21|22|23.5|25|26|27|28|29.5|32|33.5|35|36|36.5|37.5|38',
+            'CM' => '7|8|9|10|11|12|13|14|15|16|17|18|20|21|22|23|23.5|23.5|24',
+        ],
+    ],
+    'adidas, Puma refer (UK) size in Hoopsstation website.' => [
+        'MENS SIZE' => [
+            'UK' => '6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|11.5|12|12.5|13|13.5|14',
+            'US' => '6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|11.5|12|12.5|13|13.5|14|14.5',
+            'EUR' => '39 1/3|40|40 2/3|41 2/3|42|42 2/3|43 1/3|44|44 2/3|45|46|46 2/3|47 1/3|48|48 2/3|49 1/3|50',
+            'CM' => '24.5|25|25.5|26|26.5|27|27.5|28|28.5|29|29.5|30|30.5|31|31.5|32|32.5',
+        ],
+    ],
+    'CONVERSE (US) Size in Hoopsstation website' => [
+        'CONVERSE BASKETBALL SHOE' => [
+            'U.S.A. MENS' => '6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|11.5|12|12.5|13|14',
+            'U.K.' => '5.5|5.5|6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|11.5|12|13',
+            'EUR' => '38.5|39|40|40.5|41|42|42.5|43|44|44.5|45|46|46.5|47|47.5|49',
+            'CM' => '24|24.5|25|25.5|26|26.5|27|27.5|28|28.5|29|29.5|30|30.5|31|32',
+        ],
+        'CONVERSE CHUCK TAYLOR' => [
+            'U.S.A. MENS' => '6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|11.5|12|12.5|13|13.5|14',
+            'U.K.' => '6|6.5|7|7.5|8|8.5|9|9.5|10|10.5|11|11.5|12|12.5|13|13.5|14',
+            'EUR' => '39|39.5|40|41|41.5|42|42.5|43|44|44.5|45|46|46.5|47|47.5|48.5|49',
+            'CM' => '24|25|25.5|26|26.5|27|27.5|28|28.5|29|29.5|30|30.5|31|31.5|32|32',
+        ],
+    ],
+];
+
+require SNEAKERPEAK_ROOT . '/resources/views/storefront/size-chart.php';

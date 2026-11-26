@@ -76,7 +76,7 @@ background: #f1f1f1;
     width: 20%;
     height: 40px;
     padding: 6px;
-    background: rgb(2, 2, 100);
+    background: var(--color-primary);
     color: rgb(255, 255, 255);
     font-size: 17px;
     border: 1px solid grey;
@@ -86,7 +86,7 @@ background: #f1f1f1;
 /*second navbar*/
 .navbar
 {
-    background-color: #0b0b49 ;
+    background-color: var(--color-primary) ;
     width: 100%;
     z-index: 999;
     height: 65px;
@@ -152,7 +152,7 @@ ul
 }
 .footer
 {
-    background-color: #0b0b49;
+    background-color: var(--color-primary);
     padding: 70px 0;
 }
 .footer-col

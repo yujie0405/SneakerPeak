@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
        <title>Shipping Cart</title>
-       <link rel="stylesheet" href="css/cart.css">
        <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />    
     <link rel="stylesheet" href="css/headerandfooter.css">
@@ -37,27 +36,19 @@
         {
             width: 50px;
             height: 40px;
-            background: #0b0b49;
-            color: white;
-        }
-        input[type=submit].add:hover
-        {
-            background-color: rgb(224, 224, 224);
-            color: #0b0b49;
-            
         }
     </style>
 <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+    <link rel="stylesheet" href="assets/css/cart.css?v=<?= filemtime(SNEAKERPEAK_ASSETS . '/css/cart.css') ?>">
 </head>
 
+<body>
 <header>
 <?php
 		include SNEAKERPEAK_ROOT . '/resources/views/partials/header.php';
 
 	?>
 </header>
-
-<body>
    
     <br>
     <br>
@@ -100,7 +91,7 @@
     <div class="infomation">
         <h2>Shopping Cart</h2>
     </div>
-    <div class="cart-page">
+    <div class="cart-page" tabindex="0" role="region" aria-label="Shopping cart items">
     
             <table>
                 <thead>
@@ -131,10 +122,10 @@
                         </td>
                         <td><?php  echo $row ['Select_Size']; ?></td>
                         <td> 
-                            <button class="minus" data-product="<?= htmlspecialchars($row['Product_Name']) ?>" data-size="<?= htmlspecialchars($row['Select_Size']) ?>" onclick="changeQuantity('minus.php', this)">-</button>
+                            <button class="minus" type="button" aria-label="Decrease quantity" <?= (int) $row['Select_qty'] <= 1 ? 'disabled' : '' ?> data-product="<?= htmlspecialchars($row['Product_Name']) ?>" data-size="<?= htmlspecialchars($row['Select_Size']) ?>" onclick="changeQuantity('minus.php', this)">-</button>
                             
-                            <input type="text" value="<?php echo $row['Select_qty']; ?>" min="1" readonly>
-                            <button class="plush" data-product="<?= htmlspecialchars($row['Product_Name']) ?>" data-size="<?= htmlspecialchars($row['Select_Size']) ?>" onclick="changeQuantity('plush.php', this)">+</button>
+                            <input type="text" value="<?php echo $row['Select_qty']; ?>" aria-label="Quantity" readonly>
+                            <button class="plush" type="button" aria-label="Increase quantity" data-product="<?= htmlspecialchars($row['Product_Name']) ?>" data-size="<?= htmlspecialchars($row['Select_Size']) ?>" onclick="changeQuantity('plush.php', this)">+</button>
                         </td>
                         <td class="amount"><?php echo number_format(  $amount,2); ?></td>
                         <td>
@@ -178,7 +169,7 @@
                             <td>Shipping Fee</td>
                             <td id="shipping-fee">RM <?php echo number_format($quote['shipping'], 2); ?></td>
                             </tr>
-                            <tr>
+                            <tr class="cart-total-row">
                                 <td>Total</td>
                                 
                                 <td id="total-amount">RM <?php echo number_format($quote['total'], 2); ?> </td>
@@ -189,27 +180,27 @@
                                 </td>
                             </tr>
                             <tr>
-                            <form method="post" action="cart.php">
-                                <td><input type="text" name="Promote_Code" placeholder="Enter The Promote Code"></td>
-                                <td><input type="hidden" name="cart_token" value="<?= htmlspecialchars($token) ?>"><input type="submit" value="Add" class="add" name="applyPromo"></td>
-                            </form>
+
+                                <td><input type="text" form="cart-promotion" aria-label="Promotion code" name="Promote_Code" value="<?= htmlspecialchars($promoCode) ?>" placeholder="Enter The Promote Code"></td>
+                                <td><input form="cart-promotion" type="hidden" name="cart_token" value="<?= htmlspecialchars($token) ?>"><input form="cart-promotion" type="submit" value="Add" class="add" name="applyPromo"></td>
                             </tr>
                         </table>
-            <form method="post" action="">               
+                        <form id="cart-promotion" method="post" action="cart.php"></form>
                     </div>
+                    <form method="post" action="cart.php">
                     <div class="checkout">
                         <div class="buttoncheckout">
                             
                             <a href="menu.php">Back To Menu</a>
                             <input type="hidden" name="cart_token" value="<?= htmlspecialchars($token) ?>">
                             <input type="hidden" name="PC" value="<?= htmlspecialchars($promoCode) ?>">
-                            <input type="submit" value="Proceed To Checkout" name="PTC">
+                            <input type="submit" value="Proceed To Checkout" name="PTC" <?= !$items ? 'disabled' : '' ?>>
                         </div>
                         
                         
                     </div>
         </form>
-</body>
+
 
 
 <footer>
@@ -239,4 +230,5 @@
   <?php if ($mapsKey = sneakerpeakSetting('MAPS_BROWSER_KEY')) { ?><script src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($mapsKey) ?>&sensor=false"></script><?php } ?>
   <?php if (!empty($mapsKey)) { ?><script src="js/google-map.js"></script><?php } ?>
   <script src="js/main.js"></script>
+</body>
 </html>

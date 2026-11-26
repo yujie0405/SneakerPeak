@@ -136,7 +136,7 @@
 .submit input[type=submit]
 {
     
-    background: rgb(2, 2, 100);
+    background: var(--color-primary);
     font-size: 25px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     color: white;
