@@ -7,19 +7,26 @@
     <title>Brands and Categories | Sneaker Peak</title>
     <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
     <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
+    <script src="assets/js/admin-lookup-tabs.js" defer></script>
 </head>
 <body class="admin-workspace">
 <?php require SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php'; ?>
 <main class="home-section">
     <header class="home-content"><h1>Brands and categories</h1></header>
-    <?php if ($notice !== null) { ?><p class="admin-catalog-notice" role="status"><?= htmlspecialchars($notice) ?></p><?php } ?>
-    <?php if ($error !== null) { ?><p class="admin-catalog-notice admin-field-error" role="alert"><?= htmlspecialchars($error) ?></p><?php } ?>
+    <nav class="admin-lookup-tabs" data-lookup-tabs aria-label="Lookup types">
+        <?php foreach ($lookups as $type => $lookup) { ?>
+            <a class="admin-button" id="lookup-tab-<?= $type ?>" href="?tab=<?= $type ?>"
+               data-panel="<?= $type ?>"<?= $activeLookup === $type ? ' aria-current="page"' : '' ?>><?= $lookup['label'] ?></a>
+        <?php } ?>
+    </nav>
     <?php foreach ($lookups as $type => $lookup) { ?>
-        <section class="table" id="<?= $type ?>">
+        <section class="table" id="<?= $type ?>"<?= $activeLookup === $type ? '' : ' hidden' ?>>
             <header class="table__header">
                 <h2><?= $lookup['heading'] ?></h2>
                 <a class="admin-button primary" href="?type=<?= $type ?>#<?= $type ?>-editor">Add <?= strtolower($lookup['label']) ?></a>
             </header>
+            <?php if ($activeLookup === $type && $notice !== null) { ?><p class="admin-catalog-notice" role="status"><?= htmlspecialchars($notice) ?></p><?php } ?>
+            <?php if ($activeLookup === $type && $error !== null) { ?><p class="admin-catalog-notice admin-field-error" role="alert"><?= htmlspecialchars($error) ?></p><?php } ?>
             <?php if ($editing === $type) { ?>
                 <form id="<?= $type ?>-editor" class="admin-lookup-form" method="post" action="admin_addbrand.php#<?= $type ?>-editor" enctype="multipart/form-data">
                     <h3><?= $editId === null ? 'Add' : 'Edit' ?> <?= strtolower($lookup['label']) ?></h3>
@@ -39,7 +46,7 @@
                     </div>
                     <div class="admin-actions">
                         <button type="submit">Save</button>
-                        <a class="admin-button secondary" href="admin_addbrand.php#<?= $type ?>">Cancel</a>
+                        <a class="admin-button secondary" href="admin_addbrand.php?tab=<?= $type ?>">Cancel</a>
                     </div>
                 </form>
             <?php } ?>

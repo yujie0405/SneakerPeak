@@ -1,185 +1,86 @@
+<?php use SneakerPeak\App\Models\OrderModel; ?>
 <!DOCTYPE html>
-<!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
-<html lang="en" dir="ltr">
-  <head>
-    <title>Orders | Sneaker Peak</title>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-
-    <link rel="stylesheet" href="css/Order.css">
-    <link rel="stylesheet" href="css/admin_prodlist.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- Boxiocns CDN Link -->
-    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <style>
-       #Shipping {
-          display: inline-block;
-          padding: 5px 10px;
-          background-color: rgb(170, 243, 0);
-          color: black;
-          font-weight: bold;
-          border-radius: 4px;
-          transition: transform 0.3s ease;
-        }
-
-        #Shipping:hover {
-          transform: scale(1.1);
-        }
-        .alert {
-          background-color: #ccc; /* Change the background color to a desired read-only style */
-         
-          
-          opacity: 0.7; /* Adjust the opacity to give a visual cue of the button being disabled */
-        }
-        .Filter
-        {
-          padding-left: 50px;
-          
-        }
-        .Filter select
-        {
-          width: 400px;
-          height: 40px;
-        }
-       
-     </style>
-   <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
-<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Orders | Sneaker Peak</title>
+    <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+    <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
 <body class="admin-workspace">
- <?php
-  include SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
- ?>
-  <section class="home-section">
-    <header class="home-content"><h1>Order List</h1></header>
-    <div class="statusbox">
-      <div class="bigbox">
-        <div class="Processing">
-          <div class="processimg">
-            <img src="image/logo/processing.png" alt="">
-          </div>
-          <div class="proceP">
-            <h2>Processing: <span class="Num"><?php echo $totalPending ?></span> </h2>
-          </div>
-        </div>
-        <div class="Processing">
-          <div class="shippingimg">
-            <img src="image/logo/shipping.png" alt="">
-          </div>
-          <div class="proceP">
-            <h2>Shipped: <span class="Num"><?php echo $totalShipping?></span> </h2>
-          </div>
-        </div>
-        <div class="Processing">
-          <div class="completeimg">
-            <img src="image/logo/complete.png" alt="">
-          </div>
-          <div class="proceP">
-            <h2>Complete: <span class="Num"><?php echo $totalComplete?></span> </h2>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="contenbar">
-      <div class="table">
-        <section class="table__header">
-             <h1>Order List </h1> 
-         </section>
-         <section class="table__body">
-              
-              <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Scrollable table"><table>
-                <thead>
-                  <tr>
-                    <th>No.</th>
-                    <th>Order Code</th>
-                    <th>Order Date</th>
-                    <th>Total Amount</th>
-                    <th>Payment Type</th>
-                    <th>Payment Status</th>
-                    <th>Order Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-        <tbody class="table__body">
-        <?php
-                         $count = 1;
-                        foreach ($orders as $row) {
-                          ?>
-          <tr>
-            <td><?=$count?></td>
-            <td><?php echo $row['Order_code']?></td>
-            <td><?php echo $row['Order_Date']?></td>
-            <td>RM<?php echo number_format(  $row['Order_TotalAmmount'],2); ?></td>
-            <td><?php echo $row['Payment_Type']?></td>
-            <td>
-            <?php
-             if($row['Payment_Status']=='Paying'){
-            ?>
-              <span id="processing">Pending</span>
-             <?php }else{?>
-              <span id="complete">Complete</span>
-             <?php } ?>
-            </td>
-            <td>
-            <?php
-             if($row['Order_Status']=='Pending'){
-            ?>
-            <span id="processing">Pending</span>
-              <?php }elseif($row['Order_Status']=='Shipped'){ ?>
-                <span id="Shipping">Shipped</span>
-                <?php }else{ ?>
-
-                  <span id="complete">Complete</span>
-                  <?php }?>
-            </td>
-            <td>
-            <?php
-             if($row['Payment_Status']=='Paying'){
-            ?>
-           <div class="buttonbox">
-            <button title="View Order" class="alert" onclick="showPaymentAlert()">
-              View
-            </button>
-          </div>
-            <?php }else{ ?>
-              <div class="buttonbox">
-              <button title="View Order" onclick="viewOrder('<?php echo $row['Order_code']; ?>')">
-                View
-              </button>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php'; ?>
+<main class="home-section">
+    <header class="home-content"><h1>Orders</h1></header>
+    <div class="bigbox">
+        <?php foreach ([
+            'Pending' => [$totalPending, 'processing.png'],
+            'Shipping' => [$totalShipping, 'shipping.png'],
+            'Complete' => [$totalComplete, 'complete.png'],
+        ] as $label => [$total, $icon]) { ?>
+            <div class="board">
+                <img class="admin-order-summary-icon" src="assets/image/logo/<?= $icon ?>" alt="" width="28" height="28">
+                <p><?= $label ?> <strong><?= (int) $total ?></strong></p>
             </div>
-          <?php }?>
-            </td>
-           
-          </tr>
-          <?php
-                      $count = $count + 1;    
-                        }
-
+        <?php } ?>
+    </div>
+    <section class="table">
+        <header class="table__header"><h2><?= $customerName === null ? 'Order list' : 'Orders for ' . htmlspecialchars($customerName) ?></h2></header>
+        <form class="admin-catalog-filters admin-list-filters" method="get" action="admin-Orderlist.php" aria-label="Order filters">
+            <?php if ($customerName !== null) { ?><input type="hidden" name="customer" value="<?= htmlspecialchars($customerId) ?>"><?php } ?>
+            <label>Search order code <input type="search" name="search" value="<?= htmlspecialchars($filters['search']) ?>"></label>
+            <label>Date from <input type="date" name="date_from" value="<?= htmlspecialchars($filters['date_from']) ?>"></label>
+            <label>Date to <input type="date" name="date_to" value="<?= htmlspecialchars($filters['date_to']) ?>"></label>
+            <?php foreach (['payment_type' => 'Payment type', 'payment_status' => 'Payment status', 'order_status' => 'Order status'] as $field => $label) { ?>
+                <label><?= $label ?>
+                    <select name="<?= $field ?>">
+                        <option value="">All</option>
+                        <?php foreach ($orderOptions[$field] as $value => $option) { ?>
+                            <option value="<?= $value ?>"<?= $filters[$field] === $value ? ' selected' : '' ?>><?= $option ?></option>
+                        <?php } ?>
+                    </select>
+                </label>
+            <?php } ?>
+            <div class="admin-actions">
+                <button type="submit">Apply filters</button>
+                <a class="admin-button secondary" href="admin-Orderlist.php">Clear filters</a>
+            </div>
+        </form>
+        <?php if ($error !== null) { ?>
+            <p class="admin-field-error" role="alert"><?= htmlspecialchars($error) ?></p>
+        <?php } elseif (!$orders) { ?>
+            <p>No orders match your filters.</p>
+        <?php } else { ?>
+            <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Order results">
+                <table>
+                    <thead><tr>
+                        <th scope="col">Order code</th><th scope="col">Order date</th><th scope="col">Amount (RM)</th>
+                        <th scope="col">Payment type</th><th scope="col">Payment status</th><th scope="col">Order status</th><th scope="col">Actions</th>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ($orders as $row) {
+                        $paymentStatus = $row['Payment_Status'];
+                        $paymentBadge = match ($paymentStatus) {
+                            'Paying' => 'pending',
+                            'Complete' => 'complete',
+                            default => 'neutral',
+                        };
                         ?>
-        </tbody>
-      </table></div>
-             
-         </section>
-      </div>
-   
-  </section>
-  <script>
-        function showPaymentAlert() {
-      Swal.fire({
-        title: 'Payment Pending',
-        text: 'The customer has not made the payment yet.',
-        icon: 'warning',
-        confirmButtonText: 'OK'
-      });
-    }
-    function viewOrder(orderCode) {
-      window.location.href = "admin_OrderDetails.php?orderCode=" + orderCode;
-    }
-
-
-
-  </script>
+                        <tr>
+                            <th scope="row"><?= htmlspecialchars($row['Order_code']) ?></th>
+                            <td><?= htmlspecialchars($row['Order_Date'] ?? '—') ?></td>
+                            <td class="admin-numeric"><?= number_format((float) $row['Order_TotalAmmount'], 2) ?></td>
+                            <td><?= htmlspecialchars(OrderModel::PAYMENT_TYPES[$row['Payment_Type'] ?? 'unset'] ?? $row['Payment_Type']) ?></td>
+                            <td><span class="admin-payment-badge <?= $paymentBadge ?>"><?= htmlspecialchars(OrderModel::PAYMENT_STATUSES[$paymentStatus] ?? $paymentStatus) ?></span></td>
+                            <td><?= htmlspecialchars(OrderModel::ORDER_STATUSES[$row['Order_Status']] ?? $row['Order_Status']) ?></td>
+                            <td><a class="admin-button secondary" href="admin_OrderDetails.php?orderCode=<?= rawurlencode($row['Order_code']) ?>">View</a></td>
+                        </tr>
+                    <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php } ?>
+    </section>
+</main>
 </body>
 </html>

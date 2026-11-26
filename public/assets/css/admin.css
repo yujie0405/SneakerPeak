@@ -329,24 +329,72 @@
     label > :is(input, select, textarea) { display: block; margin-top: .2rem; }
 .admin-workspace .admin-full-field { grid-column: 1 / -1; }
 .admin-workspace .admin-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem; }
-.admin-workspace .admin-draft-tabs {
+.admin-workspace :is(.admin-lookup-tabs, .admin-draft-progress) {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: .35rem;
     max-width: 30rem;
-    margin-bottom: var(--admin-gap);
+    margin: 0 0 var(--admin-gap);
 }
-.admin-workspace .admin-draft-tabs [role=tab] {
-    background: var(--color-surface);
-    color: var(--color-primary);
+.admin-workspace .admin-lookup-tabs .admin-button {
     border-color: var(--color-border);
 }
-.admin-workspace .admin-draft-tabs [role=tab]:enabled:hover { background: var(--color-bg); }
-.admin-workspace .admin-draft-tabs [role=tab][aria-selected=true] {
+.admin-workspace .admin-draft-progress { padding: 0; list-style: none; }
+.admin-workspace .admin-draft-progress li {
+    padding: .35rem .5rem;
+    border: 1px solid var(--color-border);
+    border-radius: .35rem;
+}
+.admin-workspace .admin-lookup-tabs :is([aria-selected=true], [aria-current]),
+.admin-workspace .admin-draft-progress [aria-current=step] {
     background: var(--color-accent);
     color: var(--color-primary);
     border-color: var(--color-primary);
+    font-weight: 700;
 }
+.admin-workspace .admin-list-filters { margin-bottom: .85rem; }
+.admin-workspace .admin-list-filters .admin-actions { align-self: end; }
+.admin-workspace .admin-form-group {
+    min-width: 0;
+    margin: 0 0 .85rem;
+    padding: .55rem .7rem .7rem;
+    border: 1px solid var(--color-border);
+    border-radius: .35rem;
+}
+.admin-workspace .admin-form-group legend { padding-inline: .25rem; font-weight: 650; }
+.admin-workspace .admin-form-actions { margin-top: .65rem; }
+.admin-workspace .admin-table-scroll :is(th, td).admin-numeric { text-align: right; font-variant-numeric: tabular-nums; }
+.admin-workspace .admin-order-summary-icon {
+    flex: none;
+    width: 1.75rem;
+    height: 1.75rem;
+    object-fit: contain;
+}
+.admin-workspace .admin-order-thumbnail {
+    width: 2.25rem;
+    height: 2.25rem;
+    object-fit: contain;
+}
+.admin-workspace .admin-payment-badge {
+    display: inline-block;
+    padding: .15rem .55rem;
+    border-radius: 1rem;
+    background: #edf0f2;
+    color: var(--color-muted);
+    font-size: .75rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.admin-workspace .admin-payment-badge.pending { background: #fff2cc; color: var(--color-warning); }
+.admin-workspace .admin-payment-badge.complete { background: #e4f5e9; color: var(--color-success); }
+.admin-workspace .admin-order-totals {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: .2rem 1rem;
+    max-width: 23rem;
+    margin: .75rem 0 0 auto;
+}
+.admin-workspace .admin-order-totals dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .admin-workspace .admin-button {
     display: inline-flex;
     align-items: center;

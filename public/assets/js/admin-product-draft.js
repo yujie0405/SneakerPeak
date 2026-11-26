@@ -3,49 +3,67 @@ const sizeRows = draftForm.querySelector('[data-size-rows]');
 const sizeTemplate = draftForm.querySelector('[data-size-template]');
 const addSize = draftForm.querySelector('[data-add-size]');
 const summary = draftForm.querySelector('[data-draft-summary]');
-const saveProduct = draftForm.querySelector('button[type=submit]');
-const tabList = draftForm.querySelector('[data-draft-tabs]');
-const tabs = Array.from(tabList.querySelectorAll('[role=tab]'));
-const panels = tabs.map(tab => document.getElementById(tab.getAttribute('aria-controls')));
+const saveProduct = draftForm.querySelector('[data-draft-save]');
+const nextStep = draftForm.querySelector('[data-draft-next]');
+const backStep = draftForm.querySelector('[data-draft-back]');
+const progress = draftForm.querySelector('[data-draft-progress]');
+const steps = Array.from(draftForm.querySelectorAll('[data-draft-step]'));
+let currentStep = 0;
 const maxRows = Number(draftForm.dataset.sizeLimit);
 let nextRow = Math.max(0, ...Array.from(sizeRows.querySelectorAll('select'), control => Number(control.name.match(/\d+/)[0]))) + 1;
 
-function activateDraftTab(index) {
-    for (const [position, tab] of tabs.entries()) {
-        const selected = index === position;
-        tab.setAttribute('aria-selected', String(selected));
-        tab.tabIndex = selected ? 0 : -1;
-        panels[position].hidden = !selected;
+function showDraftStep(index, focusHeading = false) {
+    currentStep = index;
+    for (const [position, step] of steps.entries()) {
+        const current = position === index;
+        step.hidden = !current;
+        if (current) progress.children[position].setAttribute('aria-current', 'step');
+        else progress.children[position].removeAttribute('aria-current');
     }
+    backStep.hidden = index === 0;
+    nextStep.hidden = index === steps.length - 1;
+    saveProduct.hidden = !nextStep.hidden;
+    if (focusHeading) steps[index].querySelector('h2').focus();
 }
 
-for (const [index, tab] of tabs.entries()) {
-    panels[index].setAttribute('role', 'tabpanel');
-    panels[index].setAttribute('aria-labelledby', tab.id);
-    tab.addEventListener('click', () => activateDraftTab(index));
-    tab.addEventListener('keydown', event => {
-        const targets = {
-            ArrowLeft: (index + tabs.length - 1) % tabs.length,
-            ArrowRight: (index + 1) % tabs.length,
-            Home: 0,
-            End: tabs.length - 1
-        };
-        if (!Object.hasOwn(targets, event.key)) return;
-        event.preventDefault();
-        activateDraftTab(targets[event.key]);
-        tabs[targets[event.key]].focus();
-    });
-}
-activateDraftTab(0);
-tabList.hidden = false;
-// Handle validation before the browser tries to focus a control in a hidden panel.
+progress.hidden = false;
+showDraftStep(0);
 draftForm.noValidate = true;
 
 function revealDraftField(field) {
-    const index = panels.findIndex(panel => panel.contains(field));
-    if (index !== -1) activateDraftTab(index);
+    const index = steps.findIndex(step => step.contains(field));
+    if (index !== -1) showDraftStep(index);
     field.focus();
 }
+
+function validateDraftFields(fields) {
+    for (const field of fields) {
+        if (field.type === 'file') {
+            const file = field.files[0];
+            let message = '';
+            if (file?.size > 2000000) message = 'Choose an image smaller than 2 MB.';
+            else if (file?.type && !['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+                message = 'Choose a JPEG, PNG, WebP or GIF image.';
+            }
+            field.setCustomValidity(message);
+        }
+        if (field.willValidate && !field.validity.valid) {
+            revealDraftField(field);
+            field.reportValidity();
+            return false;
+        }
+    }
+    return true;
+}
+
+function advanceDraft() {
+    if (validateDraftFields(steps[currentStep].querySelectorAll('input, select, textarea'))) {
+        showDraftStep(currentStep + 1, true);
+    }
+}
+
+nextStep.addEventListener('click', advanceDraft);
+backStep.addEventListener('click', () => showDraftStep(currentStep - 1, true));
 
 function updateSizeButtons() {
     addSize.disabled = sizeRows.children.length >= maxRows;
@@ -89,7 +107,7 @@ function showDraftErrors(errors) {
         message.hidden = !error;
         const control = draftForm.elements.namedItem(field);
         if (error && firstInvalidField === null) {
-            firstInvalidField = control || message.closest('[role=tabpanel]')?.querySelector('select, input');
+            firstInvalidField = control || message.closest('[data-draft-step]')?.querySelector('select, input');
         }
         if (!control) continue;
         message.id = 'draft-error-' + field.replace(/[^a-z0-9]+/gi, '-');
@@ -113,12 +131,11 @@ function showDraftErrors(errors) {
 draftForm.addEventListener('submit', async event => {
     event.preventDefault();
     if (saveProduct.disabled) return;
-    const invalidField = Array.from(draftForm.elements).find(field => field.willValidate && !field.validity.valid);
-    if (invalidField) {
-        revealDraftField(invalidField);
-        invalidField.reportValidity();
+    if (currentStep < steps.length - 1) {
+        advanceDraft();
         return;
     }
+    if (!validateDraftFields(Array.from(draftForm.elements))) return;
     // The live form holds the shared draft, including the selected File objects.
     const draft = new FormData(draftForm);
     saveProduct.disabled = true;

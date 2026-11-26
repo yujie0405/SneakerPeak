@@ -6,6 +6,10 @@ use mysqli;
 
 final class OrderModel
 {
+    public const PAYMENT_TYPES = ['Card_Payment' => 'Card payment', 'QR_Payment' => 'QR payment', 'unset' => 'Not selected'];
+    public const PAYMENT_STATUSES = ['Paying' => 'Pending', 'Complete' => 'Complete'];
+    public const ORDER_STATUSES = ['Pending' => 'Pending', 'Shipping' => 'Shipping', 'Shipped' => 'Shipped', 'Complete' => 'Complete'];
+
     public const FIELDS = "Id AS ID, UserId AS UID, OrderCode AS Order_code,
         DATE_FORMAT(OrderedOn, '%d/%m/%Y') AS Order_Date, NetItemsAmount AS Order_TotalAmmount,
         ShippingFee AS ShippingFeed, PaymentType AS Payment_Type, PaymentStatus AS Payment_Status,

@@ -16,6 +16,8 @@ $notice = $_SESSION['catalog_lookup_notice'] ?? null;
 unset($_SESSION['catalog_lookup_notice']);
 $error = null;
 $editing = CatalogInput::text($_GET, 'type');
+$requestedTab = CatalogInput::text($_GET, 'tab');
+$activeLookup = isset($lookups[$editing]) ? $editing : (isset($lookups[$requestedTab]) ? $requestedTab : 'brand');
 $editId = CatalogInput::id($_GET['id'] ?? null);
 $editName = null;
 
@@ -34,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(400);
         exit('Choose a lookup and action.');
     }
+    $activeLookup = $editing;
 
     ['table' => $table, 'key' => $key, 'label' => $label] = $lookups[$editing];
     $referenceMessage = "This " . strtolower($label)
@@ -81,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $verb = ['add' => 'added', 'edit' => 'updated', 'delete' => 'deleted'][$action];
         $_SESSION['catalog_lookup_notice'] = "$label $verb.";
-        header('Location: admin_addbrand.php#' . $editing);
+        header('Location: admin_addbrand.php?tab=' . $activeLookup);
         exit;
     } catch (Throwable $exception) {
         $conn->rollback();

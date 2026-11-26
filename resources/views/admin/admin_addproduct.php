@@ -44,20 +44,18 @@ $renderSize = static function (string $index, array $row) use ($sizes, $fieldErr
         <input type="hidden" name="catalog_token" value="<?= htmlspecialchars($catalogToken) ?>">
         <input type="hidden" name="draft_id" value="<?= htmlspecialchars($draftId) ?>">
         <p class="admin-catalog-notice admin-field-error" role="alert" tabindex="-1" data-draft-summary <?= $errors ? '' : 'hidden' ?>><?= htmlspecialchars($errors['form'] ?? 'Review the fields marked below and save again.') ?></p>
-        <div class="admin-draft-tabs" data-draft-tabs role="tablist" aria-label="Product draft sections" hidden>
-            <button type="button" id="tab-product-details" role="tab" aria-controls="product-details" aria-selected="true">Product details</button>
-            <button type="button" id="tab-product-images" role="tab" aria-controls="product-images" aria-selected="false" tabindex="-1">Images</button>
-            <button type="button" id="tab-product-inventory" role="tab" aria-controls="product-inventory" aria-selected="false" tabindex="-1">Size inventory</button>
-        </div>
-        <section class="table" id="product-details">
-            <header class="table__header"><h2>Product details</h2></header>
+        <ol class="admin-draft-progress" data-draft-progress aria-label="Product creation progress" hidden>
+            <li>1. Product details</li><li>2. Images</li><li>3. Size inventory</li>
+        </ol>
+        <section class="table" id="product-details" data-draft-step>
+            <header class="table__header"><h2 tabindex="-1">Product details</h2></header>
             <div class="admin-catalog-fields">
                 <label>Product name
                     <input type="text" name="prod_name" maxlength="255" value="<?= htmlspecialchars($fields['prod_name']) ?>" required>
                     <?php $fieldError('prod_name'); ?>
                 </label>
                 <label>Price (RM)
-                    <input type="text" name="prod_price" inputmode="decimal" value="<?= htmlspecialchars($fields['prod_price']) ?>" required>
+                    <input type="text" name="prod_price" inputmode="decimal" pattern="(?:[0-9]{1,11}(?:\.[0-9]{0,2})?|\.[0-9]{1,2})" title="Enter a nonnegative price with up to two decimal places." value="<?= htmlspecialchars($fields['prod_price']) ?>" required>
                     <?php $fieldError('prod_price'); ?>
                 </label>
                 <label>Colour
@@ -81,8 +79,8 @@ $renderSize = static function (string $index, array $row) use ($sizes, $fieldErr
                 </label>
             </div>
         </section>
-        <section class="table" id="product-images">
-            <header class="table__header"><h2>Images</h2></header>
+        <section class="table" id="product-images" data-draft-step>
+            <header class="table__header"><h2 tabindex="-1">Images</h2></header>
             <p id="product-image-help">JPEG, PNG, WebP or GIF. Up to 2 MB per image.</p>
             <div class="admin-catalog-fields">
                 <?php foreach ($imageFields as $field => $label) { ?>
@@ -93,8 +91,8 @@ $renderSize = static function (string $index, array $row) use ($sizes, $fieldErr
                 <?php } ?>
             </div>
         </section>
-        <section class="table" id="product-inventory">
-            <header class="table__header"><h2>Size inventory</h2></header>
+        <section class="table" id="product-inventory" data-draft-step>
+            <header class="table__header"><h2 tabindex="-1">Size inventory</h2></header>
             <?php $fieldError('inventory'); ?>
             <div data-size-rows>
                 <?php foreach ($sizeRows as $index => $row) { $renderSize((string) $index, $row); } ?>
@@ -103,7 +101,9 @@ $renderSize = static function (string $index, array $row) use ($sizes, $fieldErr
             <template data-size-template><?php $renderSize('INDEX', ['size_id' => '', 'qty' => '']); ?></template>
         </section>
         <div class="admin-actions">
-            <button type="submit">Save product</button>
+            <button type="button" class="btn-light" data-draft-back hidden>Back</button>
+            <button type="button" data-draft-next hidden>Next</button>
+            <button type="submit" data-draft-save>Save product</button>
             <a class="admin-button secondary" href="admin_productlist.php">Cancel</a>
         </div>
     </form>
