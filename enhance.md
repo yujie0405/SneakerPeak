@@ -84,3 +84,34 @@ Make the entire admin interface more compact and easier to scan at normal browse
 - Tighten table rows, badges, and action buttons so more records are visible on desktop. Let wide tables scroll within their own containers on smaller screens. Keep actions reachable and retain visible focus states.
 - Use a consistent form layout with readable labels and field-level validation. Group related fields in columns where space permits and stack them on smaller screens. Keep save, cancel, and destructive actions easy to distinguish.
 - Preserve existing metrics, data, routes, permissions, and management workflows. Verify representative dashboard, list, detail, and form pages at normal zoom on laptop, desktop, and narrow mobile widths. Confirm that charts and tables fit their containers and that navigation, forms, and management actions still work.
+
+## 10. Enhance admin product management
+
+### Product list and filters
+
+- In `resources/views/admin/admin_productlist.php`, show at most 20 matching products per page. Apply search and filters before counting and paginating on the server. Use a stable sort and show page numbers, Previous, and Next when applicable.
+- Support product search, brand, product status, minimum price, maximum price, category, and subcategory. Apply each filter only when it has a value and combine active filters with AND. A zero price is a valid value. Support either price bound on its own and validate invalid or reversed ranges.
+- Keep search and filter selections when paging. Return to page 1 when criteria change or are cleared. Verify unfiltered, individually filtered, combined, empty, and multi-page results.
+- Place an **Add product** button immediately to the right of the search controls on desktop. Keep it visible when the controls wrap on narrow screens.
+
+### Category schema and lookup management
+
+- The proposed schema has `E_SubCategory`, and the main category is currently stored as `T_Product.Audience`. Create `E_Category` with `Id`, a unique name, `CreatedDate`, and `AdjustedDate`. Add `T_Product.CategoryId` as a foreign key and backfill it from distinct existing audience values before switching admin and storefront queries.
+- Use the category lookup in product forms and filters. Preserve existing product-to-subcategory assignments. Confirm the relationship between categories and subcategories from current data before requiring a parent category.
+- Improve the brand, category, and subcategory management screens with consistent lists, clear labels, and visible actions. Add an **Add category** action and support editing and deleting all three lookup types. Before deletion, check product references and explain how to reassign affected products if the lookup is in use.
+
+### Product details and size-level inventory
+
+- In `resources/views/admin/admin_productdetails.php`, open a modal when an admin clicks **Update status** for a size row. Show the product, size, current status, and supported size-level status options. Save only the chosen size row after confirmation. Use the size inventory status rules independently of the overall product status.
+- Provide a separate action to adjust or restore the quantity for one size. Prefill the current quantity, accept a nonnegative whole number, and save only that size row. Keep the status unchanged unless the admin also submits a status change. Show errors and the updated row clearly.
+
+### Add-product form and draft state
+
+- Organize `resources/views/admin/admin_addproduct.php` into product details, images, and size inventory. Keep one shared draft for all sections so product fields, size rows, and chosen images stay associated while the admin moves between sections or fixes validation errors. Follow the shared-state concept of Redux within the existing PHP and JavaScript stack.
+- Collect size rows in the same draft, without a product-name selector. On Save, validate the complete draft, insert the product, and use its generated `Id` to insert each size row. Commit database changes together and clean up newly moved files if saving fails. Prevent duplicate products on repeat submission.
+
+### Central image manager
+
+- Build a shared, configurable image manager using the existing `src/App/Services/CatalogImageUpload.php` where appropriate. Load the image base directory from environment configuration and route each supported image type through a fixed mapping. Use `Product/` for product images, with dedicated `UserProfile/` and `Logo/` folders for profile images and logos. Confirm the configured base path on the target installation.
+- Validate file type and size, generate unique filenames, and store relative image paths in the database. Resolve display URLs consistently for new and existing images. Prevent a caller from specifying arbitrary filesystem destinations.
+- Verify image upload and display for each type, and test rollback after a failed product save. Confirm permissions for product and lookup edits and test referenced lookup deletion.

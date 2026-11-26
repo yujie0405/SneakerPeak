@@ -3,13 +3,13 @@ $currentAdminPage = strtolower(basename((string) parse_url($_SERVER['REQUEST_URI
 $adminNavigation = [
     '' => ['DashBoad.php' => 'Dashboard'],
     'Catalog' => [
-        'admin-ProductDashboard.php' => 'Product overview',
+        'admin-ProductDashboard.php' => 'Product Overview',
         'admin_productlist.php' => 'Products',
-        'admin_addproduct.php' => 'Add product',
-        'admin_addbrand.php' => 'Brands and categories',
+        'admin_addproduct.php' => 'Add Product',
+        'admin_addbrand.php' => 'Brands And Categories',
     ],
     'Sales' => [
-        'admin-OrderDashboard.php' => 'Order overview',
+        'admin-OrderDashboard.php' => 'Order Overview',
         'admin-Orderlist.php' => 'Orders',
         'admin_promote.php' => 'Promotions',
     ],
