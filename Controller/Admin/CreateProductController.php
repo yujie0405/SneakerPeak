@@ -2,6 +2,7 @@
 
 use SneakerPeak\Manager\CatalogImageUpload;
 use SneakerPeak\App\Services\CatalogInput;
+use SneakerPeak\Manager\EncryptionManager;
 
 require SNEAKERPEAK_ROOT . '/database/config.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/CatalogInput.php';
@@ -27,7 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(403);
         exit('Reload the form and try again.');
     }
-    $savedUrl = $_SESSION['catalog_saved_drafts'][$draftId] ?? null;
+    $savedId = CatalogInput::id($_SESSION['catalog_saved_product_ids'][$draftId] ?? null);
+    $savedUrl = $savedId === null ? null : 'admin_productdetails.php?id='
+        . EncryptionManager::encrypt($savedId, EncryptionManager::PRODUCT_DETAILS);
 
     if ($savedUrl === null) {
         foreach ($fields as $field => $_) {
@@ -97,7 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     [$fields['brand_id'], $fields['category_id'], $fields['subcategory_id'], $fields['prod_name'],
                         $fields['prod_price'], $fields['prod_colour'], $fields['prod_details'], ...$files]
                 );
-                $productId = $conn->insert_id;
+                $productId = (string) $conn->insert_id;
+                $idToken = EncryptionManager::encrypt($productId, EncryptionManager::PRODUCT_DETAILS);
                 $insertSize = $conn->prepare(
                     'INSERT INTO T_ProductSizeAndCategory (ProductId, SizeId, Qty, IsAvailable) VALUES (?, ?, ?, ?)'
                 );
@@ -105,9 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $insertSize->execute([$productId, $sizeId, $qty, (int) ($qty > 0)]);
                 }
                 $conn->commit();
-                $savedUrl = 'admin_productdetails.php?prodName=' . rawurlencode($fields['prod_name']);
-                $_SESSION['catalog_saved_drafts'][$draftId] = $savedUrl;
-                $_SESSION['catalog_saved_drafts'] = array_slice($_SESSION['catalog_saved_drafts'], -12, null, true);
+                $savedUrl = 'admin_productdetails.php?id=' . $idToken;
+                $_SESSION['catalog_saved_product_ids'][$draftId] = $productId;
+                $_SESSION['catalog_saved_product_ids'] = array_slice($_SESSION['catalog_saved_product_ids'], -12, null, true);
                 $_SESSION['catalog_product_notice'][$productId] = 'Product added.';
             } catch (Throwable $exception) {
                 $conn->rollback();

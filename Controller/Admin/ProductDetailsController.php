@@ -2,20 +2,24 @@
 
 use SneakerPeak\App\Models\ProductModel;
 use SneakerPeak\App\Services\CatalogInput;
+use SneakerPeak\Manager\EncryptionManager;
 
 require SNEAKERPEAK_ROOT . '/database/config.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/ProductModel.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/CatalogInput.php';
 
-$name = CatalogInput::text($_GET, 'prodName');
-if ($name === '') $name = $_SESSION['prodName'] ?? '';
-$row = $conn->execute_query(ProductModel::CATALOG . ' WHERE p.Name = ? ORDER BY p.Id LIMIT 1', [$name])->fetch_assoc();
+$idToken = $_GET['id'] ?? null;
+$productId = CatalogInput::id(EncryptionManager::decrypt($idToken, EncryptionManager::PRODUCT_DETAILS));
+if ($productId === null) {
+    http_response_code(400);
+    exit($idToken === null ? 'A product link is required.' : 'The product link is invalid.');
+}
+$row = $conn->execute_query(ProductModel::CATALOG . ' WHERE p.Id = ?', [$productId])->fetch_assoc();
 if (!$row) {
     http_response_code(404);
     exit('Product not found.');
 }
-$productId = $row['Prod_ID'];
-$productUrl = 'admin_productdetails.php?prodName=' . rawurlencode($row['Prod_Name']);
+$productUrl = 'admin_productdetails.php?id=' . $idToken;
 $catalogToken = $_SESSION['catalog_admin_token'] ??= bin2hex(random_bytes(32));
 $notice = $_SESSION['catalog_product_notice'][$productId] ?? null;
 $highlightRow = $_SESSION['catalog_inventory_row'][$productId] ?? null;
@@ -67,8 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'UPDATE T_Product SET Name = ?, Price = ?, Details = ?, BrandId = ?, CategoryId = ?, SubCategoryId = ? WHERE Id = ?',
                 [...array_values($edit), $productId]
             );
-            $productUrl = 'admin_productdetails.php?prodName=' . rawurlencode($edit['productName']);
-            $_SESSION['prodName'] = $edit['productName'];
             $notice = 'Product updated.';
         } elseif ($action === 'add-size') {
             $sizeId = CatalogInput::id($_POST['size_id'] ?? null);

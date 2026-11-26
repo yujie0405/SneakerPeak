@@ -91,14 +91,24 @@ Make the entire admin interface more compact and easier to scan at normal browse
 
 - In `resources/views/admin/admin_productlist.php`, show at most 20 matching products per page. Apply search and filters before counting and paginating on the server. Use a stable sort and show page numbers, Previous, and Next when applicable.
 - Support product search, brand, product status, minimum price, maximum price, category, and subcategory. Apply each filter only when it has a value and combine active filters with AND. A zero price is a valid value. Support either price bound on its own and validate invalid or reversed ranges.
+- Place **Min price** and **Max price** side by side on the same row as one price-range group. Give both fields their own labels and keep the pair together when the filter layout wraps.
+- Label the price column **Price (RM)**. Display only the formatted amount in each product row, such as `129.00`, without repeating the `RM` prefix or suffix.
 - Keep search and filter selections when paging. Return to page 1 when criteria change or are cleared. Verify unfiltered, individually filtered, combined, empty, and multi-page results.
 - Place an **Add product** button immediately to the right of the search controls on desktop. Keep it visible when the controls wrap on narrow screens.
+
+### Encrypted product detail links
+
+- Replace the product list's `View` link parameter `prodName` with `id` containing an encrypted token for `T_Product.Id`. Use a shared `Manager/EncryptionManager.php` to encrypt and decrypt it.
+- Use authenticated encryption with a fresh nonce for each token and a server-side key loaded from `.env`. Encode the resulting token with URL-safe Base64 for the query string. Store only a placeholder for the key in `.env.example`.
+- In `Controller/Admin/ProductDetailsController.php`, enforce existing admin access, then decode, authenticate, and decrypt the token. Validate the resulting positive product ID and fetch the row by `T_Product.Id` using a prepared statement. Return an appropriate error for missing, invalid, tampered, or unknown IDs.
+- Update detail links, edit and size actions, and redirects that still pass `prodName` so they use the same ID token. Keep links working after a product rename. Verify valid tokens, tampered tokens, missing products, and access without an admin session.
 
 ### Category schema and lookup management
 
 - The proposed schema has `E_SubCategory`, and the main category is currently stored as `T_Product.Audience`. Create `E_Category` with `Id`, a unique name, `CreatedDate`, and `AdjustedDate`. Add `T_Product.CategoryId` as a foreign key and backfill it from distinct existing audience values before switching admin and storefront queries.
 - Use the category lookup in product forms and filters. Preserve existing product-to-subcategory assignments. Confirm the relationship between categories and subcategories from current data before requiring a parent category.
 - Improve the brand, category, and subcategory management screens with consistent lists, clear labels, and visible actions. Add an **Add category** action and support editing and deleting all three lookup types. Before deletion, check product references and explain how to reassign affected products if the lookup is in use.
+- Add three tabs at the top of the **Brand and Category** management page: **Brand**, **Category**, and **Subcategory**. Open **Brand** by default and show the selected list and its add, edit, and delete actions in the active panel. Support keyboard navigation and keep the relevant tab selected after form submissions or validation errors.
 
 ### Product details and size-level inventory
 
@@ -108,6 +118,7 @@ Make the entire admin interface more compact and easier to scan at normal browse
 ### Add-product form and draft state
 
 - Organize `resources/views/admin/admin_addproduct.php` into product details, images, and size inventory. Keep one shared draft for all sections so product fields, size rows, and chosen images stay associated while the admin moves between sections or fixes validation errors. Follow the shared-state concept of Redux within the existing PHP and JavaScript stack.
+- Display **Product details**, **Images**, and **Size inventory** as visible sections on one page. Use one **Save product** action for the entire form. On validation failure, focus the first invalid field.
 - Collect size rows in the same draft, without a product-name selector. On Save, validate the complete draft, insert the product, and use its generated `Id` to insert each size row. Commit database changes together and clean up newly moved files if saving fails. Prevent duplicate products on repeat submission.
 
 ### Central image manager

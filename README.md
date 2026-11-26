@@ -28,8 +28,8 @@ The bundled Stripe PHP library and `prod.zip` are outside the document root. The
 | `plush.php`, `minus.php` | POST product name, size, and cart token | The cart reloads on success. Quantity stays within the signed-in customer's cart and available stock. |
 | `cart.php`, `selectaddress.php`, `Payment.php` | GET views or POST forms with cart token | Checkout proceeds to the shipping address, payment method, and invoice. |
 | `fetch_address.php` | GET `addressOption` | Checkout receives plain text from the signed-in customer's saved address. |
-| `admin_productdetails.php` | GET `prodName`; POST edits with catalog token | Admin product list links directly to the selected product. The controller also accepts the legacy session selection. |
-| `delete_item.php`, `Available_item.php` | POST product ID and catalog token | Admin catalog pages update overall product status. |
+| `admin_productdetails.php` | GET encrypted `id`, or POST edits to the same URL with a catalog token | Product detail links continue to work after renaming a product. |
+| `delete_item.php`, `Available_item.php` | POST encrypted `id` and catalog token | Admin catalog pages update overall product status. |
 | `changestatus.php`, `telluser.php` | POST order code and order token | Admin order details receives plain-text status feedback and the controller sends the configured notification. |
 
 ## Migrated database
@@ -51,3 +51,5 @@ Set IMAGE_BASE_DIR to a directory writable by PHP. A relative path resolves from
 Apply database/migrations/002-product-image-paths.sql to backfill imported product image paths. The product image columns store `prod/filename` for files under `public/assets/prod` and `Product/filename` for uploads under IMAGE_BASE_DIR. Product listings and details resolve both stored path formats.
 
 Product drafts submit the product and size rows together. In a JavaScript-enabled browser, server-side validation keeps the draft and selected images in the form. Update a size quantity and its availability separately from product details. To delete a referenced brand, category, or subcategory, reassign its products using Edit product first.
+
+Set `PRODUCT_LINK_KEY` in the private `.env` to a Base64-encoded 32-byte key. Generate it with `php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"`. Use the same key across app workers. Changing the key invalidates existing admin product links. PHP needs the OpenSSL extension.

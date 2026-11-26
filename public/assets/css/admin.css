@@ -311,6 +311,16 @@
 }
 .admin-workspace .admin-catalog-filters { flex: 1; }
 .admin-workspace .admin-catalog-filters .admin-actions { align-self: end; }
+.admin-workspace .admin-price-range {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-column: span 2;
+    gap: .65rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
 .admin-workspace .admin-catalog-filters label,
 .admin-workspace .admin-catalog-fields label,
 .admin-workspace .admin-size-row label,
@@ -319,7 +329,24 @@
     label > :is(input, select, textarea) { display: block; margin-top: .2rem; }
 .admin-workspace .admin-full-field { grid-column: 1 / -1; }
 .admin-workspace .admin-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem; }
-.admin-workspace .admin-draft-nav { gap: .45rem 1rem; margin-bottom: var(--admin-gap); }
+.admin-workspace .admin-draft-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .35rem;
+    max-width: 30rem;
+    margin-bottom: var(--admin-gap);
+}
+.admin-workspace .admin-draft-tabs [role=tab] {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    border-color: var(--color-border);
+}
+.admin-workspace .admin-draft-tabs [role=tab]:enabled:hover { background: var(--color-bg); }
+.admin-workspace .admin-draft-tabs [role=tab][aria-selected=true] {
+    background: var(--color-accent);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
 .admin-workspace .admin-button {
     display: inline-flex;
     align-items: center;
@@ -402,6 +429,7 @@
     .admin-workspace .admin-catalog-filters { width: 100%; }
 }
 @media (max-width: 500px) {
+    .admin-workspace .admin-price-range { grid-column: 1 / -1; }
     .admin-workspace .admin-button,
     .admin-workspace .admin-pagination > * { min-height: 2.5rem; }
     .admin-workspace .admin-product-detail { grid-template-columns: minmax(0, 1fr); }

@@ -1,4 +1,7 @@
-<?php use SneakerPeak\Manager\CatalogImageUpload; ?>
+<?php
+use SneakerPeak\Manager\CatalogImageUpload;
+use SneakerPeak\Manager\EncryptionManager;
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,14 +51,16 @@
                         <?php } ?>
                     </label>
                 <?php } ?>
-                <?php foreach (['min_price' => 'Min price (RM)', 'max_price' => 'Max price (RM)'] as $field => $label) { ?>
-                    <label><?= $label ?>
-                        <input type="text" inputmode="decimal" name="<?= $field ?>" value="<?= htmlspecialchars($filters[$field]) ?>"<?= isset($errors[$field]) ? ' aria-invalid="true" aria-describedby="' . $field . '-error"' : '' ?>>
-                        <?php if (isset($errors[$field])) { ?>
-                            <span class="admin-field-error" id="<?= $field ?>-error" role="alert"><?= htmlspecialchars($errors[$field]) ?></span>
-                        <?php } ?>
-                    </label>
-                <?php } ?>
+                <fieldset class="admin-price-range" aria-label="Price range in RM">
+                    <?php foreach (['min_price' => 'Min price (RM)', 'max_price' => 'Max price (RM)'] as $field => $label) { ?>
+                        <label><?= $label ?>
+                            <input type="text" inputmode="decimal" name="<?= $field ?>" value="<?= htmlspecialchars($filters[$field]) ?>"<?= isset($errors[$field]) ? ' aria-invalid="true" aria-describedby="' . $field . '-error"' : '' ?>>
+                            <?php if (isset($errors[$field])) { ?>
+                                <span class="admin-field-error" id="<?= $field ?>-error" role="alert"><?= htmlspecialchars($errors[$field]) ?></span>
+                            <?php } ?>
+                        </label>
+                    <?php } ?>
+                </fieldset>
                 <div class="admin-actions">
                     <button type="submit">Search</button>
                     <a class="admin-button secondary" href="admin_productlist.php">Clear filters</a>
@@ -71,29 +76,31 @@
                 <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Product results">
                     <table>
                         <thead><tr>
-                            <th scope="col">Product</th><th scope="col">Brand</th><th scope="col">Price</th>
+                            <th scope="col">Product</th><th scope="col">Brand</th><th scope="col">Price (RM)</th>
                             <th scope="col">Colour</th><th scope="col">Category</th><th scope="col">Subcategory</th>
                             <th scope="col">Status</th><th scope="col">Actions</th>
                         </tr></thead>
                         <tbody>
-                        <?php foreach ($products as $row) { ?>
-                            <tr data-product-id="<?= $row['Prod_ID'] ?>">
+                        <?php foreach ($products as $row) {
+                            $idToken = EncryptionManager::encrypt((string) $row['Prod_ID'], EncryptionManager::PRODUCT_DETAILS);
+                            ?>
+                            <tr>
                                 <td><div class="admin-product-cell">
                                     <?php if ($row['Prod_img1']) { ?><img src="<?= htmlspecialchars(CatalogImageUpload::url($row['Prod_img1'])) ?>" alt="" loading="lazy"><?php } ?>
                                     <?= htmlspecialchars($row['Prod_Name']) ?>
                                 </div></td>
                                 <td><?= htmlspecialchars($row['Prod_Brand']) ?></td>
-                                <td>RM <?= number_format((float) $row['Prod_Price'], 2) ?></td>
+                                <td><?= number_format((float) $row['Prod_Price'], 2) ?></td>
                                 <td><?= htmlspecialchars($row['Prod_Colour'] ?? '') ?></td>
                                 <td><?= htmlspecialchars($row['Prod_Cetegory']) ?></td>
                                 <td><?= htmlspecialchars($row['Prod_SubC']) ?></td>
                                 <td><?= htmlspecialchars(ucfirst(str_replace('-', ' ', $row['Prod_Status']))) ?></td>
                                 <td class="admin-row-actions">
-                                    <a class="admin-button secondary" href="admin_productdetails.php?prodName=<?= rawurlencode($row['Prod_Name']) ?>">View</a>
+                                    <a class="admin-button secondary" href="admin_productdetails.php?id=<?= $idToken ?>">View</a>
                                     <?php if ($row['Prod_Status'] !== 'Deleted') { ?>
                                         <form method="post" action="delete_item.php" data-product-action="Delete this product?" class="admin-inline-form">
                                             <input type="hidden" name="catalog_token" value="<?= htmlspecialchars($catalogToken) ?>">
-                                            <input type="hidden" name="id" value="<?= $row['Prod_ID'] ?>">
+                                            <input type="hidden" name="id" value="<?= $idToken ?>">
                                             <button class="delete" type="submit">Delete</button>
                                         </form>
                                     <?php } ?>

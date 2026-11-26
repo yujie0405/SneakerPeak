@@ -1,10 +1,6 @@
 <?php
-  if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
-  if(isset($_GET['prodName'])) {
-    $prodName = $_GET['prodName'];
-    $_SESSION['prodName'] = $prodName;
-  }
-
-
-?>
+$idToken = $_GET['id'] ?? null;
+header('Location: ' . (is_string($idToken) && $idToken !== ''
+    ? 'admin_productdetails.php?id=' . rawurlencode($idToken)
+    : 'admin_productlist.php'));

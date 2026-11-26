@@ -44,11 +44,11 @@ $renderSize = static function (string $index, array $row) use ($sizes, $fieldErr
         <input type="hidden" name="catalog_token" value="<?= htmlspecialchars($catalogToken) ?>">
         <input type="hidden" name="draft_id" value="<?= htmlspecialchars($draftId) ?>">
         <p class="admin-catalog-notice admin-field-error" role="alert" tabindex="-1" data-draft-summary <?= $errors ? '' : 'hidden' ?>><?= htmlspecialchars($errors['form'] ?? 'Review the fields marked below and save again.') ?></p>
-        <nav class="admin-actions admin-draft-nav" aria-label="Product draft sections">
-            <a href="#product-details">Product details</a>
-            <a href="#product-images">Images</a>
-            <a href="#product-inventory">Size inventory</a>
-        </nav>
+        <div class="admin-draft-tabs" data-draft-tabs role="tablist" aria-label="Product draft sections" hidden>
+            <button type="button" id="tab-product-details" role="tab" aria-controls="product-details" aria-selected="true">Product details</button>
+            <button type="button" id="tab-product-images" role="tab" aria-controls="product-images" aria-selected="false" tabindex="-1">Images</button>
+            <button type="button" id="tab-product-inventory" role="tab" aria-controls="product-inventory" aria-selected="false" tabindex="-1">Size inventory</button>
+        </div>
         <section class="table" id="product-details">
             <header class="table__header"><h2>Product details</h2></header>
             <div class="admin-catalog-fields">

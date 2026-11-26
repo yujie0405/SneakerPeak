@@ -54,14 +54,14 @@ $productAction = htmlspecialchars($productUrl);
                 <?php if ($row['Prod_Status'] !== 'Deleted') { ?>
                     <form method="post" action="delete_item.php" class="admin-inline-form" data-product-action="Delete this product?">
                         <input type="hidden" name="catalog_token" value="<?= $token ?>">
-                        <input type="hidden" name="id" value="<?= $productId ?>">
+                        <input type="hidden" name="id" value="<?= $idToken ?>">
                         <button class="delete" type="submit">Delete</button>
                     </form>
                 <?php } ?>
                 <?php if ($row['Prod_Status'] !== 'available') { ?>
                     <form method="post" action="Available_item.php" class="admin-inline-form" data-product-action="Make this product available?">
                         <input type="hidden" name="catalog_token" value="<?= $token ?>">
-                        <input type="hidden" name="id" value="<?= $productId ?>">
+                        <input type="hidden" name="id" value="<?= $idToken ?>">
                         <button type="submit">Make available</button>
                     </form>
                 <?php } ?>

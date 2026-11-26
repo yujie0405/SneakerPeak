@@ -4,8 +4,48 @@ const sizeTemplate = draftForm.querySelector('[data-size-template]');
 const addSize = draftForm.querySelector('[data-add-size]');
 const summary = draftForm.querySelector('[data-draft-summary]');
 const saveProduct = draftForm.querySelector('button[type=submit]');
+const tabList = draftForm.querySelector('[data-draft-tabs]');
+const tabs = Array.from(tabList.querySelectorAll('[role=tab]'));
+const panels = tabs.map(tab => document.getElementById(tab.getAttribute('aria-controls')));
 const maxRows = Number(draftForm.dataset.sizeLimit);
 let nextRow = Math.max(0, ...Array.from(sizeRows.querySelectorAll('select'), control => Number(control.name.match(/\d+/)[0]))) + 1;
+
+function activateDraftTab(index) {
+    for (const [position, tab] of tabs.entries()) {
+        const selected = index === position;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        panels[position].hidden = !selected;
+    }
+}
+
+for (const [index, tab] of tabs.entries()) {
+    panels[index].setAttribute('role', 'tabpanel');
+    panels[index].setAttribute('aria-labelledby', tab.id);
+    tab.addEventListener('click', () => activateDraftTab(index));
+    tab.addEventListener('keydown', event => {
+        const targets = {
+            ArrowLeft: (index + tabs.length - 1) % tabs.length,
+            ArrowRight: (index + 1) % tabs.length,
+            Home: 0,
+            End: tabs.length - 1
+        };
+        if (!Object.hasOwn(targets, event.key)) return;
+        event.preventDefault();
+        activateDraftTab(targets[event.key]);
+        tabs[targets[event.key]].focus();
+    });
+}
+activateDraftTab(0);
+tabList.hidden = false;
+// Handle validation before the browser tries to focus a control in a hidden panel.
+draftForm.noValidate = true;
+
+function revealDraftField(field) {
+    const index = panels.findIndex(panel => panel.contains(field));
+    if (index !== -1) activateDraftTab(index);
+    field.focus();
+}
 
 function updateSizeButtons() {
     addSize.disabled = sizeRows.children.length >= maxRows;
@@ -41,12 +81,16 @@ sizeRows.addEventListener('click', event => {
 
 function showDraftErrors(errors) {
     const messages = draftForm.querySelectorAll('[data-draft-error]');
+    let firstInvalidField = null;
     for (const message of messages) {
         const field = message.dataset.draftError;
         const error = errors[field] || '';
         message.textContent = error;
         message.hidden = !error;
         const control = draftForm.elements.namedItem(field);
+        if (error && firstInvalidField === null) {
+            firstInvalidField = control || message.closest('[role=tabpanel]')?.querySelector('select, input');
+        }
         if (!control) continue;
         message.id = 'draft-error-' + field.replace(/[^a-z0-9]+/gi, '-');
         const descriptions = (control.getAttribute('aria-describedby') || '').split(/\s+/).filter(id => id && id !== message.id);
@@ -62,13 +106,19 @@ function showDraftErrors(errors) {
     summary.hidden = Object.keys(errors).length === 0;
     if (!summary.hidden) {
         summary.textContent = errors.form || 'Review the fields marked below and save again.';
-        summary.focus();
+        revealDraftField(firstInvalidField || summary);
     }
 }
 
 draftForm.addEventListener('submit', async event => {
     event.preventDefault();
     if (saveProduct.disabled) return;
+    const invalidField = Array.from(draftForm.elements).find(field => field.willValidate && !field.validity.valid);
+    if (invalidField) {
+        revealDraftField(invalidField);
+        invalidField.reportValidity();
+        return;
+    }
     // The live form holds the shared draft, including the selected File objects.
     const draft = new FormData(draftForm);
     saveProduct.disabled = true;
