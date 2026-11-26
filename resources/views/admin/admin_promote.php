@@ -9,8 +9,8 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+    <title>Promotions | Sneaker Peak</title>
   <meta charset="UTF-8">
-  <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="css/addproduct.css">
   <link rel="stylesheet" href="css/admin_prodlist.css">
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
@@ -37,16 +37,14 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
     }
   </style>
 <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-<body>
+<body class="admin-workspace">
 <?php
 require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
 ?>
 <section class="home-section">
-  <div class="home-content">
-    <i class='bx bx-menu' ></i>
-    <span class="text">Add Promote Code </span>
-  </div>
+  <header class="home-content"><h1>Promotions</h1></header>
 
   <div class="itembox">
     <h1>Details </h1>
@@ -54,33 +52,33 @@ require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
     <div class="inputbox">
       <form method="post" enctype="multipart/form-data">
         <div class="box">
-          <h4>Promote Code:</h4>
-          <input type="text" name="Promote_Code" required>
+          <label for="admin-field-Promote_Code">Promote Code:</label>
+          <input type="text" name="Promote_Code" required id="admin-field-Promote_Code">
         </div>
         <div class="box">
-          <h4>Promote Code value:</h4>
-          <input type="text" name="Promote_CodeValue" required>
+          <label for="admin-field-Promote_CodeValue">Promote Code value:</label>
+          <input type="text" name="Promote_CodeValue" required id="admin-field-Promote_CodeValue">
         </div>
         <div class="box">
-          <h4>Auto Generate: <span id="idea">*if no idea  with the code</span> </h4>
+          <label for="generateInput">Auto Generate: <span id="idea">*if no idea  with the code</span> </label>
           <input type="text" name="generate" id="generateInput">
           <button class="Generate" type="button" onclick="generateRandomNumber()">+</button>
         </div>
         <div class="box">
-          <h4>Expire Date:</h4>
-          <input type="date" name="ExpireDate" required>
+          <label for="admin-field-ExpireDate">Expire Date:</label>
+          <input type="date" name="ExpireDate" required id="admin-field-ExpireDate">
         </div>
         <div class="box">
-          <h4>Promote Code type:</h4>
-          <select name="promotetype" id=""  class="selectinfo" required>
+          <label for="admin-field-promotetype">Promote Code type:</label>
+          <select name="promotetype"  class="selectinfo" required id="admin-field-promotetype">
             <option value="Percentage Off">Percentage Off</option>
             <option value="Value Off">Value Off</option>
             <option value="Free Shipping">Free Shipping</option>
           </select>
         </div>
         <div class="box">
-          <h4>Code Details:</h4>
-          <input type="text" name="CodeDetails"required>
+          <label for="admin-field-CodeDetails">Code Details:</label>
+          <input type="text" name="CodeDetails"required id="admin-field-CodeDetails">
         </div>
         <div class="box">
           <div class="sub">
@@ -91,11 +89,9 @@ require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
     </div>
 
   </div>
-  <br>
-  <br>
   <div class="itembox">
       <h1>PromoteCode List</h1>
-      <table>
+      <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Scrollable table"><table>
                  <thead>
                      <tr>
                          <th> No. <span class="icon-arrow"></span></th>
@@ -130,9 +126,8 @@ require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
                        $count=$count+1;
                       };?>
                  </tbody>
-             </table>
+             </table></div>
   </div>
-  <br>
 
 </section>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -171,20 +166,6 @@ if (isset($_POST['submit'])) {
     document.getElementById('generateInput').value = randomNumber; // Set the value of the input field
   }
 
-  let arrow = document.querySelectorAll(".arrow");
-  for (var i = 0; i < arrow.length; i++) {
-    arrow[i].addEventListener("click", (e) => {
-      let arrowParent = e.target.parentElement.parentElement; //selecting main parent of arrow
-      arrowParent.classList.toggle("showMenu");
-    });
-  }
-
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".bx-menu");
-  console.log(sidebarBtn);
-  sidebarBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("close");
-  });
 </script>
 </body>
 </html>

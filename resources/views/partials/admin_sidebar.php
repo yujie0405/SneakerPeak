@@ -1,94 +1,52 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<div class="sidebar close">
-<div class="logo-details">
-  
-  <span class="logo_name">Sneaker Peak</span>
-</div>
-<ul class="nav-links">
-  <li>
-    <a href="DashBoad.php">
-      <i class='bx bx-grid-alt' ></i>
-      <span class="link_name">Dashboard</span>
-    </a>
-    <ul class="sub-menu blank">
-      <li><a class="link_name" href="DashBoad.php">Dashboard</a></li>
-    </ul>
-  </li>
-  <li>
-    <div class="iocn-link">
-      <a href="admin-ProductDashboard.php">
-        <i class='bx bx-collection' ></i>
-        <span class="link_name">Product</span>
-      </a>
-      <i class='bx bxs-chevron-down arrow' ></i>
+<?php
+$currentAdminPage = strtolower(basename((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH)));
+$adminNavigation = [
+    '' => ['DashBoad.php' => 'Dashboard'],
+    'Catalog' => [
+        'admin-ProductDashboard.php' => 'Product overview',
+        'admin_productlist.php' => 'Products',
+        'admin_addproduct.php' => 'Add product',
+        'admin_addbrand.php' => 'Brands and categories',
+    ],
+    'Sales' => [
+        'admin-OrderDashboard.php' => 'Order overview',
+        'admin-Orderlist.php' => 'Orders',
+        'admin_promote.php' => 'Promotions',
+    ],
+    'Accounts' => [
+        'viewCustomers.php' => 'Customers',
+        'add_newAdmin.php' => 'Administrators',
+        'admin_profile.php' => 'Profile and password',
+    ],
+];
+$adminNavigationParent = [
+    'admin_productdetails.php' => 'admin_productlist.php',
+    'admin_orderdetails.php' => 'admin-orderlist.php',
+    'admin_account_setting.php' => 'admin_profile.php',
+    'admin_password_setting.php' => 'admin_profile.php',
+];
+?>
+<aside class="admin-sidebar">
+    <div class="admin-brand">
+        <a href="DashBoad.php">Sneaker Peak</a>
+        <button type="button" class="admin-nav-toggle" aria-controls="admin-navigation" aria-expanded="true" hidden>Menu</button>
     </div>
-    <ul class="sub-menu">
-      <li><a class="link_name" href="admin-ProductDashboard.php">Product</a></li>
-      <li><a href="admin_productlist.php">Product List</a></li>
-      <li><a href="admin_addproduct.php">Add Product</a></li>
-      
-      <li><a href="admin_addbrand.php">Brand&SubCategory</a></li>
-    </ul>
-  </li>
-  <li>
-    <div class="iocn-link">
-      <a href="#">
-      <i class="fa-regular fa-user" style="color: var(--color-surface);"></i>
-        <span class="link_name">Accounts</span>
-      </a>
-      <i class='bx bxs-chevron-down arrow' ></i>
-    </div>
-    <ul class="sub-menu">
-      <li><a class="link_name">Users</a></li>
-      <li><a href="viewCustomers.php">View Customer</a></li>
-      <li><a href="add_newAdmin.php">View Admin</a></li>
-    </ul>
-  </li>
-  <li>
-    <div class="iocn-link">
-      <a href="admin-OrderDashboard.php">
-        <i class='bx bx-plug' ></i>
-        <span class="link_name">Order</span>
-      </a>
-      <i class='bx bxs-chevron-down arrow' ></i>
-    </div>
-    <ul class="sub-menu">
-      <li><a class="link_name" href="admin-OrderDashboard.php">Order</a></li>
-      <li><a href="admin-Orderlist.php">Order List</a></li>
-    </ul>
-  </li>
-  <li>
-    <a href="admin_promote.php">
-      <i class='bx bx-compass' ></i>
-      <span class="link_name">Promote</span>
-    </a>
-    <ul class="sub-menu blank">
-      <li><a class="link_name" href="admin_promote.php">Promote</a></li>
-    </ul>
-  </li>
-  
-  <li>
-    <a href="admin_profile.php">
-      <i class='bx bx-cog' ></i>
-      <span class="link_name">Profile</span>
-    </a>
-    <ul class="sub-menu blank">
-      <li><a class="link_name" href="admin_profile.php">Profile</a></li>
-    </ul>
-  </li>
-  <li>
-<div class="profile-details">
-  <div class="profile-content">
-    <!--<img src="image/profile.jpg" alt="profileImg">-->
-  </div>
-  
-  <div class="name-job">
-    <div class="profile_name"><?= htmlspecialchars((string) ($_SESSION['name'] ?? 'Admin')) ?></div>
-    <div class="job">Admin</div>
-  </div>
-  <a href="logout.php"><i class='bx bx-log-out'></i></a>
-
-</div>
-</li>
-</ul>
-</div>
+    <nav id="admin-navigation" aria-label="Admin navigation">
+        <?php foreach ($adminNavigation as $group => $links) { ?>
+            <?php if ($group !== '') { ?><p class="admin-nav-heading"><?= htmlspecialchars($group) ?></p><?php } ?>
+            <ul>
+                <?php foreach ($links as $url => $label) {
+                    $here = strtolower($url) === $currentAdminPage;
+                    $within = strtolower($url) === ($adminNavigationParent[$currentAdminPage] ?? null);
+                    ?>
+                    <li><a href="<?= htmlspecialchars($url) ?>"<?= $here ? ' aria-current="page"' : ($within ? ' aria-current="location"' : '') ?>><?= htmlspecialchars($label) ?></a></li>
+                <?php } ?>
+            </ul>
+        <?php } ?>
+        <div class="admin-nav-account">
+            <span><?= htmlspecialchars((string) ($_SESSION['name'] ?? 'Admin')) ?></span>
+            <a href="logout.php">Log out</a>
+        </div>
+    </nav>
+</aside>
+<script src="assets/js/admin-navigation.js" defer></script>

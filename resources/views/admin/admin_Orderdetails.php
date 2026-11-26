@@ -2,9 +2,9 @@
 <!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
 <html lang="en" dir="ltr">
   <head>
+    <title>Order Details | Sneaker Peak</title>
     <meta charset="UTF-8">
-    <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
-    <link rel="stylesheet" href="css/admin.css">
+
     
     <link rel="stylesheet" href="css/admin_productd.css">
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -284,16 +284,14 @@ thead th.active,tbody td.active {
       }
     </style>
    <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-<body>
+<body class="admin-workspace">
   <?php
     require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
   ?>
   <section class="home-section">
-    <div class="home-content">
-      <i class='bx bx-menu' ></i>
-      <span class="text">Order Details</span>
-    </div>
+    <header class="home-content"><h1>Order Details</h1></header>
     <div class="contenbar">
       <div class="table">
         <section class="table__header">
@@ -303,7 +301,7 @@ thead th.active,tbody td.active {
         
         <section class="table__body">
           <div class="proddtails">
-            <table>
+            <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Scrollable table"><table>
               <thead>
                 <tr>
                   <th>S.N <span class="icon-arrow"></span></th>
@@ -337,7 +335,7 @@ thead th.active,tbody td.active {
                     }
               ?>
               </tbody>
-            </table>
+            </table></div>
             
           </div>
           <div class="Process">
@@ -442,19 +440,6 @@ thead th.active,tbody td.active {
     function goBack() {
       window.history.back();
     }
-  let arrow = document.querySelectorAll(".arrow");
-  for (var i = 0; i < arrow.length; i++) {
-    arrow[i].addEventListener("click", (e)=>{
-   let arrowParent = e.target.parentElement.parentElement;//selecting main parent of arrow
-   arrowParent.classList.toggle("showMenu");
-    });
-  }
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".bx-menu");
-  console.log(sidebarBtn);
-  sidebarBtn.addEventListener("click", ()=>{
-    sidebar.classList.toggle("close");
-  });
   </script>
 
 </body>

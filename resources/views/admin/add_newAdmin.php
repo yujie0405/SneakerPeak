@@ -10,7 +10,6 @@ require_once SNEAKERPEAK_ROOT . '/src/App/Services/EmailService.php';
 	<title>Add Admin - Admin Panel</title>
 	<link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
 	
-	<link rel="stylesheet" href="css/admin.css">
 	<link rel="stylesheet" href="css/addproduct.css">
 	<style>
 		.contenbar
@@ -169,23 +168,21 @@ require_once SNEAKERPEAK_ROOT . '/src/App/Services/EmailService.php';
 		}
 	</style>
 <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-<body>
+<body class="admin-workspace">
 	<?php 
 		include SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php'; 
 	?>
 	<section class="home-section">
-		<div class="home-content">
-			<i class='bx bx-menu'></i>
-			<span class="text">View Admins</span>
-		</div>
+		<header class="home-content"><h1>Administrators</h1></header>
 		<div class="contenbar">
 			<div class="table">
 				<section class="table__header">
 					<h1>All Admins</h1>
 				</section>
 				<section class="table__body">
-					<table>
+					<div class="admin-table-scroll" tabindex="0" role="region" aria-label="Administrators"><table>
 						<thead>
 							<tr>
 								<th>S.N <span class="icon-arrow"></span></th>
@@ -212,32 +209,30 @@ require_once SNEAKERPEAK_ROOT . '/src/App/Services/EmailService.php';
 							}
 							?>
 						</tbody>
-					</table>
+					</table></div>
 				</section>
 			</div>
 		</div>
 	</section>
 
 	<section class="home-section">
-		<br>
-		<br>
 		<div class="itembox">
 			<h1>Add New Admin</h1>
 			<div class="inputbox">
 				<form action="" method="post">
 					<div class="box">
 						<label for="name">Name:<br></label>
-						<input type="text" id="name" name="name" required>
+						<input type="text" id="name" name="name" aria-describedby="name-error" required>
 						<br><span id="name-error" class="text-danger"></span>
 					</div>
 					<div class="box">
 						<label for="email">Email:<br></label>
-						<input type="email" id="email" name="email" required>
+						<input type="email" id="email" name="email" aria-describedby="email-error" required>
 						<br><span id="email-error" class="text-danger"></span>
 					</div>
 					<div class="box">
 						<label for="password">Password:<br></label>
-						<input type="password" id="password" name="password" required>
+						<input type="password" id="password" name="password" aria-describedby="password-error requirement_1 requirement_2 requirement_3 requirement_4 requirement_5" required>
 						<br><span id="password-error" class="text-danger"></span>
 	          <span id="requirement_1" class="text-danger"></span>
 						<span id="requirement_2" class="text-danger"></span>
@@ -247,7 +242,7 @@ require_once SNEAKERPEAK_ROOT . '/src/App/Services/EmailService.php';
 					</div>
 					<div class="box">
 						<label for="confirm-password">Confirm Password:<br></label>
-						<input type="password" id="confirm-password" name="cpassword" required>
+						<input type="password" id="confirm-password" name="cpassword" aria-describedby="password-match-error" required>
 						<br><span id="password-match-error" class="text-danger"></span>
 					</div>
 					<button class="btn btn-primary" type="submit" id="add-button" name="add" onclick="return validateForm()">Add Admin</button>
@@ -258,19 +253,6 @@ require_once SNEAKERPEAK_ROOT . '/src/App/Services/EmailService.php';
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
-		let arrow = document.querySelectorAll(".arrow");
-  for (var i = 0; i < arrow.length; i++) {
-    arrow[i].addEventListener("click", (e)=>{
-   let arrowParent = e.target.parentElement.parentElement;//selecting main parent of arrow
-   arrowParent.classList.toggle("showMenu");
-    });
-  }
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".bx-menu");
-  console.log(sidebarBtn);
-  sidebarBtn.addEventListener("click", ()=>{
-    sidebar.classList.toggle("close");
-	});
 
 		function validateForm() {
 			var name = document.getElementById("name").value;

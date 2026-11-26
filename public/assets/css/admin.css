@@ -1,264 +1,295 @@
-/* Google Fonts Import Link */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+/* Shared admin workspace */
+.admin-workspace {
+    --admin-sidebar-width: 12rem;
+    --admin-gutter: clamp(.75rem, 2vw, 1.5rem);
+    --admin-gap: .875rem;
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: .875rem/1.5 system-ui, sans-serif;
 }
-.sidebar{
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 260px;
-  background: var(--color-primary);
-  z-index: 100;
-  transition: all 0.5s ease;
+
+.admin-workspace *, .admin-workspace *::before, .admin-workspace *::after { box-sizing: border-box; }
+.admin-workspace :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.admin-workspace [hidden] { display: none !important; }
+
+.admin-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--admin-sidebar-width);
+    overflow-y: auto;
+    background: var(--color-primary);
+    color: var(--color-surface);
+    z-index: 20;
+    padding: .8rem .65rem;
 }
-.sidebar.close{
-  width: 78px;
+.admin-brand { display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .3rem .5rem .75rem; }
+.admin-brand > a { color: var(--color-surface); font-size: 1.05rem; font-weight: 750; text-decoration: none; }
+.admin-sidebar ul { list-style: none; padding: 0; margin: 0 0 .65rem; }
+.admin-nav-heading { color: #d3d6d8; margin: .65rem .55rem .2rem; font-size: .72rem; font-weight: 650; }
+.admin-sidebar nav a {
+    display: block;
+    padding: .35rem .55rem;
+    border-radius: .35rem;
+    color: var(--color-surface);
+    text-decoration: none;
+    overflow-wrap: anywhere;
 }
-.sidebar .logo-details{
-  height: 60px;
-  width: 100%;
-  display: flex;
-  align-items: center;
+.admin-sidebar nav a:hover { background: var(--color-nav-hover); }
+.admin-sidebar nav a[aria-current] {
+    background: var(--color-accent);
+    color: var(--color-primary);
+    font-weight: 700;
 }
-.sidebar .logo-details i{
-  font-size: 30px;
-  color: var(--color-surface);
-  height: 50px;
-  min-width: 78px;
-  text-align: center;
-  line-height: 50px;
+.admin-sidebar :focus-visible { outline-color: var(--color-accent); outline-offset: -2px; }
+.admin-nav-account { padding: .6rem .55rem 0; border-top: 1px solid #606971; overflow-wrap: anywhere; }
+.admin-nav-account a { margin-left: -.55rem; }
+.admin-sidebar .admin-nav-toggle {
+    min-height: 2.5rem;
+    border: 1px solid #a5adb4;
+    border-radius: .375rem;
+    background: var(--color-primary);
+    color: var(--color-surface);
+    padding: .35rem .75rem;
+    cursor: pointer;
 }
-.sidebar .logo-details .logo_name{
-  font-size: 22px;
-  color: var(--color-surface);
-  font-weight: 600;
-  font-style: italic;
-  transition: 0.3s ease;
-  transition-delay: 0.1s;
-  padding-left: 20px;
-  
+.admin-sidebar .admin-nav-toggle:hover { background: var(--color-nav-hover); }
+
+.admin-workspace .home-section {
+    margin-inline-start: var(--admin-sidebar-width);
+    padding: var(--admin-gutter);
+    min-width: 0;
+    max-width: 100%;
 }
-.sidebar.close .logo-details .logo_name{
-  transition-delay: 0s;
-  opacity: 0;
-  pointer-events: none;
- 
-}
-.sidebar .nav-links{
-  height: 100%;
-  padding: 30px 0 150px 0;
-  overflow: auto;
-}
-.sidebar.close .nav-links{
-  overflow: visible;
-}
-.sidebar .nav-links::-webkit-scrollbar{
-  display: none;
-}
-.sidebar .nav-links li{
-  position: relative;
-  list-style: none;
-  transition: all 0.4s ease;
-}
-.sidebar .nav-links li:hover{
-  background: var(--color-nav-hover);
-}
-.sidebar .nav-links li .iocn-link{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.sidebar.close .nav-links li .iocn-link{
-  display: block
-}
-.sidebar .nav-links li i{
-  height: 50px;
-  min-width: 78px;
-  text-align: center;
-  line-height: 50px;
-  color: var(--color-surface);
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.sidebar .nav-links li.showMenu i.arrow{
-  transform: rotate(-180deg);
-}
-.sidebar.close .nav-links i.arrow{
-  display: none;
-}
-.sidebar .nav-links li a{
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
-.sidebar .nav-links li a .link_name{
-  font-size: 18px;
-  font-weight: 400;
-  color: var(--color-surface);
-  transition: all 0.4s ease;
-}
-.sidebar.close .nav-links li a .link_name{
-  opacity: 0;
-  pointer-events: none;
-}
-.sidebar .nav-links li .sub-menu{
-  padding: 6px 6px 14px 80px;
-  margin-top: -10px;
-  background: var(--color-nav-hover);
-  display: none;
-}
-.sidebar .nav-links li.showMenu .sub-menu{
-  display: block;
-}
-.sidebar .nav-links li .sub-menu a{
-  color: var(--color-surface);
-  font-size: 15px;
-  padding: 5px 0;
-  white-space: nowrap;
-  opacity: 0.6;
-  transition: all 0.3s ease;
-}
-.sidebar .nav-links li .sub-menu a:hover{
-  opacity: 1;
-}
-.sidebar.close .nav-links li .sub-menu{
-  position: absolute;
-  left: 100%;
-  top: -10px;
-  margin-top: 0;
-  padding: 10px 20px;
-  border-radius: 0 6px 6px 0;
-  opacity: 0;
-  display: block;
-  pointer-events: none;
-  transition: 0s;
-}
-.sidebar.close .nav-links li:hover .sub-menu{
-  top: 0;
-  opacity: 1;
-  pointer-events: auto;
-  transition: all 0.4s ease;
-}
-.sidebar .nav-links li .sub-menu .link_name{
-  display: none;
-}
-.sidebar.close .nav-links li .sub-menu .link_name{
-  font-size: 18px;
-  opacity: 1;
-  display: block;
-}
-.sidebar .nav-links li .sub-menu.blank{
-  opacity: 1;
-  pointer-events: auto;
-  padding: 3px 20px 6px 16px;
-  opacity: 0;
-  pointer-events: none;
-}
-.sidebar .nav-links li:hover .sub-menu.blank{
-  top: 50%;
-  transform: translateY(-50%);
-}
-.sidebar .profile-details{
-  position: fixed;
-  bottom: 0;
-  width: 260px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--color-nav-hover);
-  padding: 12px 0;
-  transition: all 0.5s ease;
-}
-.sidebar.close .profile-details{
-  background: none;
-}
-.sidebar.close .profile-details{
-  width: 78px;
-}
-.sidebar .profile-details .profile-content{
-  display: flex;
-  align-items: center;
-}
-.sidebar .profile-details img{
-  height: 52px;
-  width: 52px;
-  object-fit: cover;
-  border-radius: 16px;
-  margin: 0 14px 0 12px;
-  background: var(--color-nav-hover);
-  transition: all 0.5s ease;
-}
-.sidebar.close .profile-details img{
-  padding: 10px;
-}
-.sidebar .profile-details .profile_name,
-.sidebar .profile-details .job{
-  color: var(--color-surface);
-  font-size: 18px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-.sidebar.close .profile-details i,
-.sidebar.close .profile-details .profile_name,
-.sidebar.close .profile-details .job{
-  display: none;
-}
-.sidebar .profile-details .job{
-  font-size: 12px;
-}
-.home-section{
-  position: relative;
-  background: var(--color-bg);
-  height: 100%;
-  left: 260px;
-  width: calc(100% - 260px);
-  transition: all 0.5s ease;
-}
-.sidebar.close ~ .home-section{
-  left: 78px;
-  width: calc(100% - 78px);
-}
-.home-section .home-content{
-  height: 60px;
-  display: flex;
-  align-items: center;
-}
-.home-section .home-content .bx-menu,
-.home-section .home-content .text{
-  color: var(--color-text);
-  font-size: 35px;
-}
-.home-section .home-content .bx-menu{
-  margin: 0 15px;
-  cursor: pointer;
-}
-.home-section .home-content .text{
-  font-size: 26px;
-  font-weight: 600;
-}
-@media (max-width: 400px) {
-  .sidebar.close .nav-links li .sub-menu{
-    display: none;
-  }
-  .sidebar{
-    width: 78px;
-  }
-  .sidebar.close{
-    width: 0;
-  }
-  .home-section{
-    left: 78px;
-    width: calc(100% - 78px);
-    z-index: 100;
-  }
-  .sidebar.close ~ .home-section{
+.admin-workspace .home-content { margin: 0 0 var(--admin-gap); }
+.admin-workspace h1 { font-size: 1.4rem; line-height: 1.25; }
+.admin-workspace h2 { font-size: 1.1rem; line-height: 1.32; }
+.admin-workspace h3 { font-size: .975rem; }
+.admin-workspace .home-content h1 { margin: 0; font-weight: 750; }
+.admin-workspace .home-section p { overflow-wrap: anywhere; }
+
+.admin-workspace :is(.contenbar, .statusbox) { width: 100%; min-width: 0; height: auto; padding: 0; margin: 0 0 var(--admin-gap); }
+.admin-workspace :is(.table, .tabl, .itembox, .addbrand-box, .addsubcateg-box, .admin-profile-panel) {
     width: 100%;
-    left: 0;
-  }
+    min-width: 0;
+    height: auto;
+    max-height: none;
+    margin: 0 0 var(--admin-gap);
+    padding: var(--admin-gap);
+    border: 1px solid var(--color-border);
+    border-radius: .6rem;
+    background: var(--color-surface);
+    box-shadow: none;
+    overflow: visible;
+    backdrop-filter: none;
+}
+.admin-workspace :is(.addbrand-box, .addsubcateg-box) :is(.container, .brand-inputbox, .subcateg-inputbox, .table, .table-warpper) {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+.admin-workspace :is(.table__header, .table__heade) {
+    width: 100%;
+    height: auto;
+    margin: 0 0 .65rem;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3rem 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    font-size: inherit;
+}
+.admin-workspace :is(.table__header, .table__heade) :is(h1, p) { margin: 0; }
+.admin-workspace :is(.table__header, .table__heade) h1 { font-size: 1.1rem; }
+.admin-workspace :is(.table__body, .table__bod, .tableform, .table-warpper) {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: visible;
+}
+.admin-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: .4rem;
+}
+.admin-workspace .admin-table-scroll table { width: 100%; margin: 0; border-collapse: collapse; }
+.admin-workspace .admin-table-scroll :is(td, th) {
+    min-width: 0;
+    padding: .45rem .65rem;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border);
+}
+.admin-workspace .admin-table-scroll th { position: static; background: var(--color-primary); color: var(--color-surface); white-space: nowrap; }
+.admin-workspace .admin-table-scroll tbody tr:nth-child(even) { background: var(--color-bg); }
+.admin-workspace .admin-table-scroll td img { width: 2.5rem; height: 2.5rem; object-fit: contain; }
+.admin-workspace .admin-table-scroll :is(.status, #processing, #complete, #Shipping, .status_available, .status_unavailable) {
+    display: inline-block;
+    white-space: nowrap;
+    padding: .15rem .45rem;
+    border-radius: .4rem;
+    font-size: .75rem;
+    font-weight: 650;
+    height: auto;
+}
+.admin-workspace .button .btnst ul { display: flex; gap: .35rem; margin: 0; padding: 0; }
+.admin-workspace .button .btnst ul li { padding: 0; }
+.admin-workspace .button .btnst ul li :is(.view, .delete) button {
+    width: auto;
+    height: auto;
+    padding: .32rem .6rem;
+    margin: 0;
+}
+.admin-workspace .button .btnst ul li .view button i { min-width: 0; height: auto; line-height: 1; font-size: 1rem; }
+
+.admin-workspace :is(.bigbox, .counte, .topprod, .graph) {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: var(--admin-gap);
+    margin: 0 0 var(--admin-gap);
+    padding: 0;
+}
+.admin-workspace .graph { grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+.admin-workspace :is(.Processing, .board) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .65rem;
+    min-width: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: .65rem .8rem;
+    border: 1px solid var(--color-border);
+    border-radius: .5rem;
+    background: var(--color-bg);
+    box-shadow: none;
+    transform: none;
+}
+.admin-workspace :is(.Processing, .board) :is(h1, h2, h3, p) { font-size: .9rem; margin: 0; overflow-wrap: anywhere; }
+.admin-workspace .Processing :is(.processimg, .shippingimg, .completeimg, .proceP) { height: auto; width: auto; padding: 0; }
+.admin-workspace .Processing img,
+.admin-workspace .topprod .product img { display: block; width: 2rem; height: 2rem; object-fit: contain; }
+.admin-workspace .topprod .product { display: flex; align-items: center; gap: .55rem; }
+.admin-workspace .chart-container {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: clamp(15rem, 26vw, 20rem);
+}
+.admin-workspace .chart-container canvas { display: block; max-width: 100%; }
+
+.admin-workspace :is(.inputbox, .brand-inputbox, .subcateg-inputbox) { padding: 0; }
+.admin-workspace :is(.inputbox, .brand-inputbox, .subcateg-inputbox) > form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: .65rem var(--admin-gap);
+    align-items: start;
+}
+.admin-workspace :is(.itembox, .addbrand-box, .addsubcateg-box) .box { min-width: 0; padding: 0; margin: 0; }
+.admin-workspace :is(.itembox, .addbrand-box, .addsubcateg-box) h1 { padding: 0; margin: 0 0 .55rem; font-size: 1.1rem; }
+.admin-workspace .box :is(h2, h3, label), .admin-workspace form label { margin: 0 0 .25rem; font-size: .875rem; font-weight: 650; }
+.admin-workspace .box:has(.sub),
+.admin-workspace .inputbox form > button[type=submit] { grid-column: 1 / -1; justify-self: start; }
+.admin-workspace form :is(input:not([type=hidden],[type=submit],[type=button],[type=checkbox],[type=radio]), select, textarea, .form-control),
+.admin-workspace .box :is(input:not([type=hidden],[type=submit]), select.selectinfo, textarea) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 2.25rem;
+    height: auto;
+    padding: .35rem .5rem;
+    border: 1px solid var(--color-input-border);
+    border-radius: .35rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+}
+.admin-workspace form textarea { min-height: 4.5rem; resize: vertical; }
+.admin-workspace form :is(input, select, textarea):user-invalid { border-color: var(--color-danger); }
+.admin-workspace :is(.form, .formclase, .Filter) form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: .5rem .7rem;
+    margin: .5rem 0 .8rem;
+}
+.admin-workspace :is(.form, .formclase, .Filter) form label { display: block; }
+.admin-workspace :is(.form, .formclase, .Filter) form :is(input[type=date], input[type=text], select) { width: auto; max-width: 100%; }
+.admin-workspace :is(.form, .formclase, .Filter) form h1 { font-size: .85rem; margin: 0; }
+
+.admin-workspace .home-section button,
+.admin-workspace .home-section input[type=submit],
+.admin-workspace .box .sub input[type=submit] {
+    width: auto;
+    height: auto;
+    min-height: 2rem;
+    max-width: 100%;
+    padding: .32rem .65rem;
+    border: 1px solid var(--color-primary);
+    border-radius: .35rem;
+    background: var(--color-primary);
+    color: var(--color-surface);
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+}
+.admin-workspace .home-section :is(button, input[type=submit]):enabled:hover { background: var(--color-nav-hover); }
+.admin-workspace .home-section :is(.button .delete button, button.delete) { background: var(--color-danger); border-color: var(--color-danger); }
+.admin-workspace .home-section :is(.button .delete button, button.delete):hover { filter: brightness(.9); background: var(--color-danger); }
+.admin-workspace .home-section .btn-light { background: var(--color-surface); color: var(--color-primary); }
+.admin-workspace .home-section .btn-light:hover { background: var(--color-bg); color: var(--color-primary); }
+.admin-workspace .home-section :is(button, input[type=submit]):disabled { opacity: .65; cursor: not-allowed; }
+
+.admin-workspace .proddtails { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: var(--admin-gap); }
+.admin-workspace .proddtails .pn { padding: 0; min-width: 0; }
+.admin-workspace .proddtails .pn h1 { font-size: 1.3rem; }
+.admin-workspace .img-container > img { display: block; width: min(100%, 20rem); height: auto; max-height: 18rem; object-fit: contain; }
+.admin-workspace .hover-container { margin-top: .5rem; }
+.admin-workspace .hover-container div { padding: .25rem; }
+.admin-workspace :is(.button-status, .butn, .buttonbox) { display: flex; flex-wrap: wrap; gap: .45rem; padding: 0; margin: .75rem 0 0; }
+.admin-workspace .popup {
+    width: min(calc(100vw - 2rem), 32rem);
+    max-height: calc(100vh - 2rem);
+    overflow: auto;
+    padding: 1rem;
+}
+.admin-workspace .popup .close { display: grid; place-items: center; top: .45rem; right: .45rem; }
+
+.admin-workspace .admin-profile-panel { display: grid; grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr); gap: var(--admin-gap); }
+.admin-workspace .profile-tab-nav { min-width: 0; border-right: 1px solid var(--color-border); padding: 0 .65rem 0 0; }
+.admin-workspace .admin-avatar-form { display: grid; justify-items: start; gap: .35rem; margin: 0 0 .75rem; }
+.admin-workspace .admin-avatar-form label { margin: 0; }
+.admin-workspace .admin-avatar-form input[type=file] { padding: .25rem; }
+.admin-workspace .admin-avatar { width: 3.5rem; height: 3.5rem; border-radius: 50%; object-fit: cover; }
+.admin-workspace .admin-profile-tabs { display: flex; flex-wrap: wrap; gap: .35rem; }
+.admin-workspace .profile-tab-nav button[aria-current] { background: var(--color-accent); color: var(--color-primary); }
+.admin-workspace .admin-profile-panel .tab-content { min-width: 0; padding: 0; }
+.admin-workspace .admin-profile-panel .form-group { margin-bottom: .65rem; }
+.admin-workspace .admin-profile-panel h2 { margin: 0 0 .75rem; }
+
+@media (max-width: 800px) {
+    .admin-sidebar { position: relative; inset: auto; width: 100%; padding: .55rem .65rem; }
+    .admin-brand { padding: 0 .25rem; }
+    .admin-sidebar nav { margin-top: .5rem; }
+    .admin-sidebar nav a { padding-block: .55rem; }
+    .admin-workspace .home-section { margin-inline-start: 0; }
+    .admin-workspace .admin-profile-panel { grid-template-columns: minmax(0, 1fr); }
+    .admin-workspace .profile-tab-nav { border-right: 0; border-bottom: 1px solid var(--color-border); padding: 0 0 .7rem; }
+}
+@media (max-width: 500px) {
+    .admin-workspace .home-section :is(button, input[type=submit]) { min-height: 2.5rem; }
 }

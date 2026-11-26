@@ -2,42 +2,26 @@
 <!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
 <html lang="en" dir="ltr">
   <head>
+    <title>Product Dashboard | Sneaker Peak</title>
     <meta charset="UTF-8">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
-    <link rel="stylesheet" href="css/admin.css">
+
     <link rel="stylesheet" href="css/Order.css">
     <link rel="stylesheet" href="css/admin_prodlist.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Boxiocns CDN Link -->
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      .graph {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        margin-top: 20px;
-      }
 
-      .chart-container {
-        width: 600px;
-        height: 500px;
-      }
-    </style>
-</style>
   <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-  <body>
+  <body class="admin-workspace">
     <?php
     include SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
     ?>
     <section class="home-section">
-      <div class="home-content">
-        <i class='bx bx-menu' ></i>
-        <span class="text">Product Dashboard </span>
-      </div>
+      <header class="home-content"><h1>Product Dashboard</h1></header>
       <div class="statusbox">
         <div class="bigbox">
           <div class="Processing">
@@ -74,13 +58,17 @@
           </section>
           <section class="table__body">
             <div class="graph">
-                <div class="chart-container">
-                  <h1>Total Of Brand</h1>
-                  <canvas id="productChart"></canvas>
+                <div class="admin-chart">
+                  <h2>Products by brand</h2>
+                  <div class="chart-container">
+                    <canvas id="productChart" role="img" aria-label="Products by brand"></canvas>
+                  </div>
                 </div>
-                <div class="chart-container">
-                <h1>Total Of Status</h1>
-                  <canvas id="statusChart"></canvas>
+                <div class="admin-chart">
+                  <h2>Products by status</h2>
+                  <div class="chart-container">
+                    <canvas id="statusChart" role="img" aria-label="Products by status"></canvas>
+                  </div>
                 </div>
             </div>
           </section>
@@ -128,17 +116,8 @@
     },
     options: {
       responsive: true,
-      legend: {
-        position: 'bottom',
-      },
-      layout: {
-        padding: {
-          left: 30,
-          right: 30,
-          top: 30,
-          bottom: 30
-        }
-      }
+      maintainAspectRatio: false,
+      plugins: { legend: { position: "bottom", labels: { boxWidth: 12 } } }
     }
   });
 </script>
@@ -170,6 +149,7 @@
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true,
@@ -185,20 +165,6 @@
         window.location.href = "admin_OrderDetails.php?orderCode=" + orderCode;
       }
   
-      let arrow = document.querySelectorAll(".arrow");
-      for (var i = 0; i < arrow.length; i++) {
-        arrow[i].addEventListener("click", (e)=>{
-          let arrowParent = e.target.parentElement.parentElement; // Selecting the main parent of the arrow
-          arrowParent.classList.toggle("showMenu");
-        });
-      }
-  
-      let sidebar = document.querySelector(".sidebar");
-      let sidebarBtn = document.querySelector(".bx-menu");
-      console.log(sidebarBtn);
-      sidebarBtn.addEventListener("click", ()=>{
-        sidebar.classList.toggle("close");
-      });
     </script>
   </body>
 </html>

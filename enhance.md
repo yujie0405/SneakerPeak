@@ -1,6 +1,6 @@
 # SneakerPeak Customer-Facing Enhancements
 
-Improve the customer-facing color palette, navbar dropdowns, size chart, cart, and product listing while preserving the existing storefront design and shopping flow. This specification covers the storefront and customer account pages.
+Improve the customer-facing color palette, navbar dropdowns, size chart, cart, and product listing while preserving the existing storefront design and shopping flow. This specification also covers the database cutover and a responsive revamp of the admin interface.
 
 ## 1. Match the navbar color across customer pages
 
@@ -73,3 +73,14 @@ Use `database/proposed-schema.sql` and read-only checks against the active XAMPP
 - Check customer and admin login, registration, account verification, password reset, and sessions. The new user table has no legacy OTP column. Identify what storage or schema changes these flows require and document any blocked flows. Treat migrated accounts with a null password hash as requiring password recovery.
 - Preserve the already imported data in `sneakerpeak`. Keep `sneakerpeak_legacy` and `database/sneakerpeak.sql` available for unresolved records. The one-time import script has been removed. Run write-path tests on a database copy and avoid triggering live email or payment calls.
 - Verify the homepage, catalog and product details, customer accounts, wishlist, cart, promotions, checkout, order history and invoices, and admin product and order management. Report which workflows passed and any remaining data or schema gaps.
+
+## 9. Revamp the admin dashboard and management pages
+
+Make the entire admin interface more compact and easier to scan at normal browser zoom. Start with the main, product, and order dashboards in `resources/views/admin/`, then apply the same layout and sizing to product and brand management, order lists and details, customers, promotions, admin account creation, profile, and password settings.
+
+- Review `resources/views/partials/admin_sidebar.php`, `admin_profile_sidebar.php`, and the existing admin CSS. Standardize the sidebar, page headers, typography, spacing, and controls through shared admin styles. Replace page-specific fixed dimensions where they cause oversized elements or overflow.
+- Give the sidebar a compact desktop width and make it collapsible on narrow screens. Keep the current page clearly highlighted and ensure the sidebar leaves enough room for the content.
+- Reduce excess height and padding in summary cards and charts. Arrange related cards in a responsive grid and let them stack at smaller widths. Keep chart labels and legends readable and resize charts with their containers.
+- Tighten table rows, badges, and action buttons so more records are visible on desktop. Let wide tables scroll within their own containers on smaller screens. Keep actions reachable and retain visible focus states.
+- Use a consistent form layout with readable labels and field-level validation. Group related fields in columns where space permits and stack them on smaller screens. Keep save, cancel, and destructive actions easy to distinguish.
+- Preserve existing metrics, data, routes, permissions, and management workflows. Verify representative dashboard, list, detail, and form pages at normal zoom on laptop, desktop, and narrow mobile widths. Confirm that charts and tables fit their containers and that navigation, forms, and management actions still work.

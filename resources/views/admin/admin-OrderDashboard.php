@@ -2,37 +2,26 @@
 <!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
 <html lang="en" dir="ltr">
   <head>
+    <title>Order Dashboard | Sneaker Peak</title>
     <meta charset="UTF-8">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
-    <link rel="stylesheet" href="css/admin.css">
+
     <link rel="stylesheet" href="css/Order.css">
     <link rel="stylesheet" href="css/admin_prodlist.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Boxiocns CDN Link -->
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      .chart-container {
-        width: 100%;
-        height: 100%; /* Adjust the height as needed */
-      }
-      .formclase
-      {
-        padding-left: 30px;
-      }
-    </style>
+
   <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-  <body>
+  <body class="admin-workspace">
     <?php
     include SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
     ?>
     <section class="home-section">
-      <div class="home-content">
-        <i class='bx bx-menu' ></i>
-        <span class="text">Order Dashboard </span>
-      </div>
+      <header class="home-content"><h1>Order Dashboard</h1></header>
       <div class="statusbox">
         <div class="bigbox">
           <div class="Processing">
@@ -64,29 +53,19 @@
       <div class="contenbar">
         <div class="table">
         <section class="table__header">
-        <?php if (isset($_POST['date'])): ?>
-          <h1>Total Order Between <?php echo $totalOrders ?></h1>
-        <?php else: ?>
-          <h1>Total Order Of this Week <?php echo $totalOrders ?></h1>
-        <?php endif; ?>
-        <p>
-          <?php if (isset($_POST['date'])): ?>
-            Week: <?php echo $date1 ?> ~ <?php echo $date2 ?>
-          <?php else: ?>
-            Week: <?php echo $weekStart ?> ~ <?php echo $weekEnd ?>
-          <?php endif; ?>
-        </p>
+        <h2>Orders: <?= (int) $totalOrders ?></h2>
+          <p><?= htmlspecialchars($start) ?> to <?= htmlspecialchars($end) ?></p>
       </section>
           <section class="formclase">
             <form action="admin-OrderDashboard.php" method="post">
-              <input type="date" name="date1" id="" required>
-              <input type="date" name="date2" id="" required>
+              <div><label for="order-start">Start date</label><input type="date" name="date1" id="order-start" value="<?= htmlspecialchars($start) ?>" required></div>
+              <div><label for="order-end">End date</label><input type="date" name="date2" id="order-end" value="<?= htmlspecialchars($end) ?>" required></div>
               <input type="submit" value="Search" name="date">
             </form>
           </section>
           <section class="table__body">
             <div class="chart-container">
-              <canvas id="orderChart"></canvas>
+              <canvas id="orderChart" role="img" aria-label="Orders by date"></canvas>
             </div>
           </section>
         </div>
@@ -117,6 +96,7 @@
         data: chartData,
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           scales: {
             x: {
               display: true,
@@ -142,20 +122,6 @@
         window.location.href = "admin_OrderDetails.php?orderCode=" + orderCode;
       }
   
-      let arrow = document.querySelectorAll(".arrow");
-      for (var i = 0; i < arrow.length; i++) {
-        arrow[i].addEventListener("click", (e)=>{
-          let arrowParent = e.target.parentElement.parentElement; // Selecting the main parent of the arrow
-          arrowParent.classList.toggle("showMenu");
-        });
-      }
-  
-      let sidebar = document.querySelector(".sidebar");
-      let sidebarBtn = document.querySelector(".bx-menu");
-      console.log(sidebarBtn);
-      sidebarBtn.addEventListener("click", ()=>{
-        sidebar.classList.toggle("close");
-      });
     </script>
   </body>
 </html>

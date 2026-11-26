@@ -5,25 +5,22 @@
   <title>View Customers</title>
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <link rel="stylesheet" href="css/admin_prodlist.css">
-  <link rel="stylesheet" href="css/admin.css">
 <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-<body>
+<body class="admin-workspace">
   <?php 
   if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
   require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php'; ?>
   <section class="home-section">
-    <div class="home-content">
-      <i class='bx bx-menu'></i>
-      <span class="text">View Customers</span>
-    </div>
+    <header class="home-content"><h1>Customers</h1></header>
     <div class="contenbar">
       <div class="table">
         <section class="table__header">
           <h1>All Customers</h1> 
         </section>
         <section class="table__body">
-          <table>
+          <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Scrollable table"><table>
             <thead>
               <tr>
                 <th>S.N <span class="icon-arrow"></span></th>
@@ -48,25 +45,11 @@
                   }
               ?>
             </tbody>
-          </table>
+          </table></div>
         </section>
       </div>
     </div>
   </section>
-  <script>
-    let arrow = document.querySelectorAll(".arrow");
-    for (var i = 0; i < arrow.length; i++) {
-      arrow[i].addEventListener("click", (e)=>{
-        let arrowParent = e.target.parentElement.parentElement;
-        arrowParent.classList.toggle("showMenu");
-      });
-    }
-    let sidebar = document.querySelector(".sidebar");
-    let sidebarBtn = document.querySelector(".bx-menu");
-    console.log(sidebarBtn);
-    sidebarBtn.addEventListener("click", ()=>{
-      sidebar.classList.toggle("close");
-    });
-  </script>
+
 </body>
 </html>

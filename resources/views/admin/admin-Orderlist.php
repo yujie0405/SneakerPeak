@@ -2,9 +2,9 @@
 <!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
 <html lang="en" dir="ltr">
   <head>
+    <title>Orders | Sneaker Peak</title>
     <meta charset="UTF-8">
-    <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
-    <link rel="stylesheet" href="css/admin.css">
+
     <link rel="stylesheet" href="css/Order.css">
     <link rel="stylesheet" href="css/admin_prodlist.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -46,16 +46,14 @@
        
      </style>
    <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-<body>
+<body class="admin-workspace">
  <?php
   include SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
  ?>
   <section class="home-section">
-    <div class="home-content">
-      <i class='bx bx-menu' ></i>
-      <span class="text">Order List</span>
-    </div>
+    <header class="home-content"><h1>Order List</h1></header>
     <div class="statusbox">
       <div class="bigbox">
         <div class="Processing">
@@ -89,25 +87,9 @@
         <section class="table__header">
              <h1>Order List </h1> 
          </section>
-         <!-- <section class="Filter">
-          <form action="admin-Orderlist.php" method="post">
-            <label for="Order_Status"><h1>Order Status:</h1></label>
-            <select name="Order_Status" id="">
-              <option value="">All</option>
-              <option value="Pending">Pending</option>
-              <option value="Shiped">Shipped</option>
-              <option value="Complete">Complete</option>
-            </select>
-          </form>
-         </section> -->
          <section class="table__body">
-             <div class="Filter">
-                <form method="get">
-                  
-                </form>
-              </div>
               
-              <table>
+              <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Scrollable table"><table>
                 <thead>
                   <tr>
                     <th>No.</th>
@@ -144,26 +126,27 @@
             <?php
              if($row['Order_Status']=='Pending'){
             ?>
-            <span id="processing">Pending</span></td>
+            <span id="processing">Pending</span>
               <?php }elseif($row['Order_Status']=='Shipped'){ ?>
                 <span id="Shipping">Shipped</span>
                 <?php }else{ ?>
 
                   <span id="complete">Complete</span>
                   <?php }?>
+            </td>
             <td>
             <?php
              if($row['Payment_Status']=='Paying'){
             ?>
            <div class="buttonbox">
             <button title="View Order" class="alert" onclick="showPaymentAlert()">
-              <i class="fa fa-search" style="color: white;"></i>
+              View
             </button>
           </div>
             <?php }else{ ?>
               <div class="buttonbox">
               <button title="View Order" onclick="viewOrder('<?php echo $row['Order_code']; ?>')">
-                <i class="fa fa-search" style="color: white;"></i>
+                View
               </button>
             </div>
           <?php }?>
@@ -176,7 +159,7 @@
 
                         ?>
         </tbody>
-      </table>
+      </table></div>
              
          </section>
       </div>
@@ -197,19 +180,6 @@
 
 
 
-  let arrow = document.querySelectorAll(".arrow");
-  for (var i = 0; i < arrow.length; i++) {
-    arrow[i].addEventListener("click", (e)=>{
-   let arrowParent = e.target.parentElement.parentElement;//selecting main parent of arrow
-   arrowParent.classList.toggle("showMenu");
-    });
-  }
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".bx-menu");
-  console.log(sidebarBtn);
-  sidebarBtn.addEventListener("click", ()=>{
-    sidebar.classList.toggle("close");
-  });
   </script>
 </body>
 </html>

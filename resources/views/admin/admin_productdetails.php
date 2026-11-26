@@ -2,9 +2,9 @@
 <!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
 <html lang="en" dir="ltr">
   <head>
+    <title>Product Details | Sneaker Peak</title>
     <meta charset="UTF-8">
-    <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
-    <link rel="stylesheet" href="css/admin.css">
+
 
     <link rel="stylesheet" href="css/admin_productd.css">
     <!-- Boxiocns CDN Link -->
@@ -268,16 +268,14 @@ thead th.active,tbody td.active {
 
      </style>
    <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-<body>
+<body class="admin-workspace">
   <?php
     require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
   ?>
   <section class="home-section">
-    <div class="home-content">
-      <i class='bx bx-menu' ></i>
-      <span class="text">Product Details</span>
-    </div>
+    <header class="home-content"><h1>Product Details</h1></header>
     <div class="contenbar">
       <div class="table">
         <section class="table__header">
@@ -307,7 +305,7 @@ thead th.active,tbody td.active {
                     <p style="max-width: 500px;"><?php  echo $row ['Prod_Details']; ?></p>
                   </div>
                   <div class="stock">
-                    <table>
+                    <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Scrollable table"><table>
                       <thead>
                         <tr>
                           <th>Size</th>
@@ -335,13 +333,9 @@ thead th.active,tbody td.active {
                           <td><button class="normal" onclick="updateQtyStatus('<?php echo $rows['Prod_Name']; ?>', '<?php echo $rows['Prod_Size']; ?>')">Update</button></td>
 
                         </tr>
+                        <?php } ?>
                       </tbody>
-                      <?php
-                        };
-               
-
-                    ?>
-                    </table>
+                    </table></div>
                     
                   </div>
                   <br>
@@ -364,35 +358,23 @@ thead th.active,tbody td.active {
         </section>
         <div id="editFormOverlay" class="overlay"></div>
         <div id="editFormPopup" class="popup">
-          <span class="close" onclick="hideEditForm()">&times;</span>
+          <button class="close" type="button" aria-label="Close product editor" onclick="hideEditForm()">&times;</button>
           <form method="post">
             <input type="hidden" name="catalog_token" value="<?= htmlspecialchars($catalogToken) ?>">
             <label for="productName">Product Name:</label>
-            <input type="text" id="productName" name="productName" value="<?php echo $row['Prod_Name']?>" required>
+            <input type="text" id="productName" name="productName" value="<?= htmlspecialchars((string) $row['Prod_Name'], ENT_QUOTES) ?>" required>
             <label for="productPrice">Product Price:</label>
             <input type="text" id="productPrice" name="productPrice" value="<?php  echo $row ['Prod_Price']; ?>" required>
             <label for="productDetails">Product Details:</label>
             <textarea id="productDetails" name="productDetails"  required><?php  echo $row ['Prod_Details']; ?></textarea>    
-            <input type="submit" value="Update" name="Update"></input>
+            <input type="submit" value="Update" name="Update">
+            <button type="button" class="btn-light" onclick="hideEditForm()">Cancel</button>
           </form>
         </div>
       </div>
     </div>
   </section>
   <script>
-  let arrow = document.querySelectorAll(".arrow");
-  for (var i = 0; i < arrow.length; i++) {
-    arrow[i].addEventListener("click", (e)=>{
-   let arrowParent = e.target.parentElement.parentElement;//selecting main parent of arrow
-   arrowParent.classList.toggle("showMenu");
-    });
-  }
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".bx-menu");
-  console.log(sidebarBtn);
-  sidebarBtn.addEventListener("click", ()=>{
-    sidebar.classList.toggle("close");
-  });
 
 
   
@@ -409,9 +391,9 @@ thead th.active,tbody td.active {
 
   // Check if any of the input values have been changed
   if (
-    productNameInput.value !== "<?php echo $row['Prod_Name']?>" ||
-    productPriceInput.value !== "<?php echo $row['Prod_Price']?>" ||
-    productDetailsInput.value !== "<?php echo $row['Prod_Details']?>"
+    productNameInput.value !== <?= json_encode((string) $row['Prod_Name'], JSON_HEX_TAG) ?> ||
+    productPriceInput.value !== <?= json_encode((string) $row['Prod_Price'], JSON_HEX_TAG) ?> ||
+    productDetailsInput.value !== <?= json_encode((string) $row['Prod_Details'], JSON_HEX_TAG) ?>
   ) {
     // Prompt the user to confirm closing the form
     Swal.fire({

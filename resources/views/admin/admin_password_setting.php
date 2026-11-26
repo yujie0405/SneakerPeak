@@ -1,22 +1,22 @@
 <div id="password">
-    <h3 class="mb-4">Password Settings</h3>
+    <h2>Password settings</h2>
     <form method="post" action="admin_profile.php">
                 <input type="hidden" name="profile_token" value="<?= htmlspecialchars($token) ?>">
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Old password</label>
-                    <input type="password" class="form-control" name="old_password" id="old-password" required>
-                    <span id="old-password-error" class="text-danger"></span>
+                    <label for="old-password">Old password</label>
+                    <input type="password" class="form-control" name="old_password" id="old-password" autocomplete="current-password" aria-describedby="old-password-error" required>
+                    <span id="old-password-error" aria-live="polite" class="text-danger"></span>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>New password</label>
-                    <input type="password" class="form-control"  name="password" id="new-password" required>
-                    <span id="new-password-error" class="text-danger"></span>
+                    <label for="new-password">New password</label>
+                    <input type="password" class="form-control"  name="password" id="new-password" autocomplete="new-password" aria-describedby="new-password-error requirement_1 requirement_2 requirement_3 requirement_4 requirement_5" required>
+                    <span id="new-password-error" aria-live="polite" class="text-danger"></span>
                     <span id="requirement_1" class="text-danger"></span>
                     <span id="requirement_2" class="text-danger"></span>
                     <span id="requirement_3" class="text-danger"></span>
@@ -26,9 +26,9 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Confirm new password</label>
-                    <input type="password" class="form-control" name="cpassword" id="confirm-password" required>
-                    <span id="confirm-password-error" class="text-danger"></span>
+                    <label for="confirm-password">Confirm new password</label>
+                    <input type="password" class="form-control" name="cpassword" id="confirm-password" autocomplete="new-password" aria-describedby="confirm-password-error" required>
+                    <span id="confirm-password-error" aria-live="polite" class="text-danger"></span>
                 </div>
             </div>
         </div>

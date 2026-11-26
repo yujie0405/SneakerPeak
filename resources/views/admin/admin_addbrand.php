@@ -7,24 +7,22 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
 <html lang="en" dir="ltr">
   <head>
+    <title>Brands and Categories | Sneaker Peak</title>
     <meta charset="UTF-8">
   
-    <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/addbrand.css">
   
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-<body>
+<body class="admin-workspace">
   <?php
     require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
   ?>
   <section class="home-section">
-    <div class="home-content">
-      <i class='bx bx-menu' ></i>
-      <span class="text">Add Brand & Sub-Category</span>
-    </div>
+    <header class="home-content"><h1>Brands and categories</h1></header>
     
     <div class="addbrand-box">
       <h1>Add Brand</h1>
@@ -34,12 +32,12 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
         <form method="post" action="admin_addbrand.php" enctype="multipart/form-data">
           <div class="box">
-            <h4>Brand Name:</h4>
-            <input type="text" name="brand_Name" id="" placeholder="Enter Brand Name" required>
+            <label for="admin-field-brand_Name">Brand Name:</label>
+            <input type="text" name="brand_Name" placeholder="Enter Brand Name" required id="admin-field-brand_Name">
           </div>
           <div class="box">
-            <h4>Brand Logo image:</h4>
-            <input type="file" name="logo_img" required>
+            <label for="admin-field-logo_img">Brand Logo image:</label>
+            <input type="file" name="logo_img" required id="admin-field-logo_img">
           </div>
           <div class="box">
             <div class="sub">
@@ -53,7 +51,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
         </div>
           <div class="table">
             <div class="table-warpper">
-              <table>
+              <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Scrollable table"><table>
                 <thead>
                   <tr>
                     <th colspan="2">Brand</th>
@@ -88,22 +86,21 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
                   ?>
                   
                 </tbody>
-              </table>
+              </table></div>
             </div> 
           </div>
       </div>
     </div>
 
 
-    <br>
     <div class="addsubcateg-box">
       <h1>Add Sub-Category</h1>
       <div class="container">
         <div class="subcateg-inputbox">
         <form method="post" action="admin_addbrand.php">
           <div class="box">
-            <h4>Sub-Category Name:</h4>
-            <input type="text" name="Sub_Category" id="" placeholder="Enter Sub-Category" required>
+            <label for="admin-field-Sub_Category">Sub-Category Name:</label>
+            <input type="text" name="Sub_Category" placeholder="Enter Sub-Category" required id="admin-field-Sub_Category">
           </div>
           <div class="box">
             <div class="sub">
@@ -114,7 +111,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
         </div>
         <div class="table">
          <div class="table-warpper">
-            <table>
+            <div class="admin-table-scroll" tabindex="0" role="region" aria-label="Scrollable table"><table>
               <thead>
                 <tr>
                   <th>Sub-Category</th>
@@ -137,7 +134,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
                   ?>
                   
               </tbody>
-            </table>
+            </table></div>
          </div> 
         </div>
 

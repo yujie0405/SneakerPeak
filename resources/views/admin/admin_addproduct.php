@@ -9,25 +9,21 @@
 
 <html lang="en" dir="ltr">
   <head>
+    <title>Add Product | Sneaker Peak</title>
     <meta charset="UTF-8">
     
-    <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/addproduct.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/theme.php'; ?>
+<?php require SNEAKERPEAK_ROOT . '/resources/views/layouts/admin.php'; ?>
 </head>
-<body>
+<body class="admin-workspace">
 <?php
     require_once SNEAKERPEAK_ROOT . '/resources/views/partials/admin_sidebar.php';
 ?>
   <section class="home-section">
-    <div class="home-content">
-      <i class='bx bx-menu' ></i>
-      <span class="text">Add Product </span>
-
-
-    </div>
+    <header class="home-content"><h1>Add product</h1></header>
     
     <div class="itembox">
       <h1>Product Details </h1>
@@ -35,12 +31,12 @@
       <div class="inputbox">
         <form method="post" enctype="multipart/form-data">
           <div class="box">
-            <h4>Product Name:</h4>
-            <input type="text" name="prod_name" required>
+            <label for="admin-field-prod_name">Product Name:</label>
+            <input type="text" name="prod_name" required id="admin-field-prod_name">
           </div>
           <div class="box">
-            <h4>Product Brand:</h4>
-            <select name="prod_brand" id="" class="selectinfo" required>
+            <label for="admin-field-prod_brand">Product Brand:</label>
+            <select name="prod_brand" class="selectinfo" required id="admin-field-prod_brand">
             <?php
                     $query = "SELECT Name AS Brand_Name FROM E_Brand";
                     $result = mysqli_query($conn,$query);
@@ -56,16 +52,16 @@
             </select>
           </div>
           <div class="box">
-            <h4>Product Price:</h4>
-            <input type="number" name="prod_price" min="1" required>
+            <label for="admin-field-prod_price">Product Price:</label>
+            <input type="number" name="prod_price" min="1" required id="admin-field-prod_price">
           </div>
           <div class="box">
-            <h4>Product Colour:</h4>
-            <input type="text" name="prod_colour" required>
+            <label for="admin-field-prod_colour">Product Colour:</label>
+            <input type="text" name="prod_colour" required id="admin-field-prod_colour">
           </div>
           <div class="box">
-            <h4>Product Category:</h4>
-            <select name="prod_gender" id="" class="selectinfo" required>
+            <label for="admin-field-prod_gender">Product Category:</label>
+            <select name="prod_gender" class="selectinfo" required id="admin-field-prod_gender">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Kid">Kid</option>
@@ -73,8 +69,8 @@
           
           </div>
           <div class="box">
-            <h4>Product Sub-Category:</h4>
-            <select name="Sub-Cetegory" id=""  class="selectinfo" required>
+            <label for="admin-field-Sub-Cetegory">Product Sub-Category:</label>
+            <select name="Sub-Cetegory"  class="selectinfo" required id="admin-field-Sub-Cetegory">
             <?php
                     $query = "SELECT Name AS S_Name FROM E_SubCategory";
                     $result = mysqli_query($conn,$query);
@@ -91,16 +87,16 @@
           
           </div>
           <div class="box">
-            <h4>Product Details:</h4>
-             <textarea name="prod_details" id=""  required></textarea>
+            <label for="admin-field-prod_details">Product Details:</label>
+             <textarea name="prod_details"  required id="admin-field-prod_details"></textarea>
           </div>
           <div class="box">
-            <h4>Product image 1:</h4>
-            <input type="file" name="prod_img1" required>
-            <h4>Product image 2:</h4>
-            <input type="file" name="prod_img2" required>
-            <h4>Product image 3:</h4>
-            <input type="file" name="prod_img3" required>
+            <label for="admin-field-prod_img1">Product image 1:</label>
+            <input type="file" name="prod_img1" required id="admin-field-prod_img1">
+            <label for="admin-field-prod_img2">Product image 2:</label>
+            <input type="file" name="prod_img2" required id="admin-field-prod_img2">
+            <label for="admin-field-prod_img3">Product image 3:</label>
+            <input type="file" name="prod_img3" required id="admin-field-prod_img3">
           </div>
           <input type="text" value="available" name="status" hidden>
           <div class="box">
@@ -111,15 +107,13 @@
         </form>
       </div>
     </div>
-    <br>
-    <br>
     <div class="itembox">
       <h1>Add Size</h1>
       <div class="inputbox">
         <form method="post" enctype="multipart/form-data">
           <div class="box">
-            <h4>Product Name:</h4>
-            <select name="p_Name" id="" class="selectinfo">
+            <label for="admin-field-p_Name">Product Name:</label>
+            <select name="p_Name" class="selectinfo" id="admin-field-p_Name">
               <option value="Select" style="display: none;">Select Product</option>
                 <?php
                     $query = "SELECT Name AS Prod_Name, Image1Path AS Prod_img1 FROM T_Product";
@@ -140,8 +134,8 @@
             </select>
           </div>
           <div class="box">
-            <h4>Product Size:</h4>
-            <select name="prod_Size" id="" class="selectinfo" required>
+            <label for="admin-field-prod_Size">Product Size:</label>
+            <select name="prod_Size" class="selectinfo" required id="admin-field-prod_Size">
               <option value="Select" style="display: none;">Select The Size</option>
               <option value="3.5">3.5</option>
               <option value="4">4</option>
@@ -165,8 +159,8 @@
             </select>
           </div>
           <div class="box">
-            <h4>Product Qty:</h4>
-            <input type="number" name="prod_qty" min="1">
+            <label for="admin-field-prod_qty">Product Qty:</label>
+            <input type="number" name="prod_qty" min="1" id="admin-field-prod_qty">
             
           </div>
           <div class="box">
@@ -233,20 +227,6 @@ if (isset($_POST['submit'])) {
 if (isset($resultMessage)) { ?>
     <script>Swal.fire({title: <?= json_encode($resultMessage, JSON_HEX_TAG) ?>});</script>
 <?php } ?>
-  <script>
-  let arrow = document.querySelectorAll(".arrow");
-  for (var i = 0; i < arrow.length; i++) {
-    arrow[i].addEventListener("click", (e)=>{
-   let arrowParent = e.target.parentElement.parentElement;//selecting main parent of arrow
-   arrowParent.classList.toggle("showMenu");
-    });
-  }
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".bx-menu");
-  console.log(sidebarBtn);
-  sidebarBtn.addEventListener("click", ()=>{
-    sidebar.classList.toggle("close");
-  });
-  </script>
+
 </body>
 </html>
