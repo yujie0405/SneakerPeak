@@ -1,5 +1,8 @@
 <?php
-    include("database/Database_Connection.php");
+     require_once("config/Database.php");
+
+      $db = \Config\Database::getInstance();
+      $conn = $db->getConnection();
     require_once("controllerUser.php");
 ?>
 <!DOCTYPE html>
