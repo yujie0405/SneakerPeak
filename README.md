@@ -53,3 +53,7 @@ Apply database/migrations/002-product-image-paths.sql to backfill imported produ
 Product drafts submit the product and size rows together. In a JavaScript-enabled browser, server-side validation keeps the draft and selected images in the form. Update a size quantity and its availability separately from product details. To delete a referenced brand, category, or subcategory, reassign its products using Edit product first.
 
 Set `PRODUCT_LINK_KEY` in the private `.env` to a Base64-encoded 32-byte key. Generate it with `php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"`. Use the same key across app workers. Changing the key invalidates existing admin product links. PHP needs the OpenSSL extension.
+
+## Promotion types
+
+On an existing migrated database, run `php database/migrations/003-promotion-types.php --prepare` before deploying the promotion lookup code. This installs the lookup and backfills missing IDs while preserving existing rows. Verify promotion management and checkout with the new code, then run the same migration with `--finalize` during a maintenance window to require the foreign key and remove the legacy type column. Fresh installations using `database/proposed-schema.sql` already have the finalized structure.

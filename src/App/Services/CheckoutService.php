@@ -22,12 +22,13 @@ final class CheckoutService
 
         $shipping = $subtotal >= 50000 ? 0 : 2000;
         $value = (float) ($promotion['Value'] ?? 0);
-        $discount = match ($promotion['Promote_type'] ?? null) {
+        $type = $promotion['TypeCode'] ?? null;
+        $discount = match ($type) {
             'FIXED' => (int) round(100 * $value),
             'PERCENTAGE' => (int) round($subtotal * $value / 100),
             default => 0,
         };
-        if (($promotion['Promote_type'] ?? null) === 'FREE_SHIPPING') {
+        if ($type === 'FREE_SHIPPING') {
             $shipping = 0;
         }
         $discount = min($subtotal, max(0, $discount));

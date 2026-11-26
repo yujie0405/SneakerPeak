@@ -12,10 +12,10 @@
 <main class="home-section">
     <header class="home-content"><h1>Promotions</h1></header>
     <section class="table">
-        <header class="table__header"><h2>Add promotion</h2></header>
+        <header class="table__header"><h2><?= $editing ? 'Edit promotion' : 'Add promotion' ?></h2></header>
         <?php if ($notice !== null) { ?><p role="status"><?= htmlspecialchars($notice) ?></p><?php } ?>
         <?php if ($error !== null) { ?><p class="admin-field-error" role="alert"><?= htmlspecialchars($error) ?></p><?php } ?>
-        <form method="post" action="<?= htmlspecialchars($listUrl) ?>">
+        <form method="post" action="<?= htmlspecialchars($formUrl) ?>">
             <input type="hidden" name="promotion_token" value="<?= htmlspecialchars($token) ?>">
             <div class="admin-catalog-fields">
                 <div>
@@ -23,17 +23,21 @@
                     <button class="btn-light" type="button" onclick="document.getElementById('promotion-code').value = String(Math.floor(100000 + Math.random() * 900000))">Generate code</button>
                 </div>
                 <label>Value <input type="text" name="Promote_CodeValue" inputmode="decimal" value="<?= htmlspecialchars($fields['Promote_CodeValue']) ?>" required></label>
-                <label>Expiry date <input type="date" name="ExpireDate" value="<?= htmlspecialchars($fields['ExpireDate']) ?>" required></label>
+                <label>Expiry date <input type="date" name="ExpireDate" value="<?= htmlspecialchars($fields['ExpireDate']) ?>"<?= $editing ? '' : ' required' ?>></label>
                 <label>Promotion type
-                    <select name="promotetype" required>
-                        <?php foreach ($promotionTypes as $value => $label) { ?>
-                            <option value="<?= $value ?>"<?= $fields['promotetype'] === $value ? ' selected' : '' ?>><?= $label ?></option>
+                    <select name="type_id" required>
+                        <option value="">Choose a promotion type</option>
+                        <?php foreach ($promotionTypes as $type) { ?>
+                            <option value="<?= $type['Id'] ?>"<?= $fields['type_id'] === (string) $type['Id'] ? ' selected' : '' ?>><?= htmlspecialchars($type['Name']) ?></option>
                         <?php } ?>
                     </select>
                 </label>
                 <label>Description <input type="text" name="CodeDetails" maxlength="255" value="<?= htmlspecialchars($fields['CodeDetails']) ?>" required></label>
             </div>
-            <div class="admin-actions admin-form-actions"><button type="submit" name="submit">Add promotion</button></div>
+            <div class="admin-actions admin-form-actions">
+                <button type="submit" name="submit"><?= $editing ? 'Save changes' : 'Add promotion' ?></button>
+                <?php if ($editing) { ?><a class="admin-button secondary" href="<?= htmlspecialchars($listUrl) ?>">Cancel</a><?php } ?>
+            </div>
         </form>
     </section>
     <section class="table">
@@ -56,7 +60,7 @@
                 <table>
                     <thead><tr>
                         <th scope="col">Code</th><th scope="col">Value</th><th scope="col">Expiry date</th>
-                        <th scope="col">Type</th><th scope="col">Description</th><th scope="col">Status</th>
+                        <th scope="col">Type</th><th scope="col">Description</th><th scope="col">Status</th><th scope="col">Actions</th>
                     </tr></thead>
                     <tbody>
                     <?php foreach ($promotions as $promotion) { ?>
@@ -64,9 +68,10 @@
                             <th scope="row"><?= htmlspecialchars($promotion['Code']) ?></th>
                             <td><?= htmlspecialchars($promotion['PromotionValue']) ?></td>
                             <td><?= htmlspecialchars($promotion['ExpiresOn'] ?? '—') ?></td>
-                            <td><?= htmlspecialchars($promotionTypes[$promotion['PromotionType']]) ?></td>
+                            <td><?= htmlspecialchars($promotion['PromotionTypeName']) ?></td>
                             <td><?= htmlspecialchars($promotion['Details']) ?></td>
                             <td><?= htmlspecialchars($promotion['Status']) ?></td>
+                            <td><a class="admin-button secondary" href="<?= htmlspecialchars($promotionUrl((string) $promotion['Id'])) ?>">Edit</a></td>
                         </tr>
                     <?php } ?>
                     </tbody>
