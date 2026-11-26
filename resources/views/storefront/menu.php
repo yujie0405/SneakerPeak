@@ -96,7 +96,7 @@
                                    href="<?= htmlspecialchars($pageUrl($page) . '&' . http_build_query(['add' => $product['Prod_Name']])) ?>">
                                     <i class="fa-solid fa-heart" aria-hidden="true"></i>
                                 </a>
-                                <img class="catalog-card-image" src="prod/<?= rawurlencode($product['Prod_img1']) ?>" alt="" loading="lazy">
+                                <img class="catalog-card-image" src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($product['Prod_img1'])) ?>" alt="" loading="lazy">
                                 <h2><?= htmlspecialchars($product['Prod_Name']) ?></h2>
                                 <p class="catalog-description"><?= htmlspecialchars($product['Prod_Details']) ?></p>
                                 <p class="catalog-price">RM <?= htmlspecialchars($product['Prod_Price']) ?></p>

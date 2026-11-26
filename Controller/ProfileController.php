@@ -1,6 +1,7 @@
 <?php
 
 use SneakerPeak\App\Services\AuthService;
+use SneakerPeak\Manager\CatalogImageUpload;
 
 require SNEAKERPEAK_ROOT . '/database/config.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/AuthService.php';
@@ -59,26 +60,12 @@ if ($save || $change || $upload) {
             }
             $_SESSION['profile_message'] = 'Your password has been updated.';
         } else {
-            $image = $_FILES['image'];
-            if ($image['error'] !== UPLOAD_ERR_OK || $image['size'] > 1200000 || !is_uploaded_file($image['tmp_name'])) {
-                throw new DomainException('Choose a JPEG or PNG under 1.2 MB.');
-            }
-            $info = @getimagesize($image['tmp_name']);
-            $extension = match ($info[2] ?? null) {
-                IMAGETYPE_JPEG => 'jpg',
-                IMAGETYPE_PNG => 'png',
-                default => throw new DomainException('Choose a JPEG or PNG image.'),
-            };
-            $filename = bin2hex(random_bytes(16)) . '.' . $extension;
-            $destination = SNEAKERPEAK_ASSETS . '/img/' . $filename;
-            if (!move_uploaded_file($image['tmp_name'], $destination)) {
-                throw new DomainException('The image could not be saved.');
-            }
+            $filename = CatalogImageUpload::save($_FILES['image'], CatalogImageUpload::PROFILE);
             try {
                 $update = $conn->prepare("UPDATE T_User SET ProfileImage = ? WHERE Id = ?");
                 $update->execute([$filename, $profileId]);
             } catch (Throwable $error) {
-                unlink($destination);
+                CatalogImageUpload::remove($filename);
                 throw $error;
             }
             $_SESSION['profile_message'] = 'Your profile photo has been updated.';

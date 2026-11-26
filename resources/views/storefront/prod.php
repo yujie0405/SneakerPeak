@@ -57,15 +57,15 @@
             ?>
                 <!--1****-->
                 <div class="swiper-slide">
-                <img src="prod/<?php  echo $row ['Prod_img1']; ?>" >
+                <img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($row['Prod_img1'])) ?>" >
                 </div>
                 <!--2****-->
                 <div class="swiper-slide">
-                <img src="prod/<?php  echo $row ['Prod_img2']; ?>" >
+                <img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($row['Prod_img2'])) ?>" >
                 </div>
                 <!--3****-->
                 <div class="swiper-slide">
-                <img src="prod/<?php  echo $row ['Prod_img3']; ?>" >
+                <img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($row['Prod_img3'])) ?>" >
                 </div>
                 <!--4****-->
              

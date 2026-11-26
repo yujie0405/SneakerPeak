@@ -22,7 +22,11 @@ final class Application
 
         define('SNEAKERPEAK_ROOT', $root);
         define('SNEAKERPEAK_ASSETS', $root . '/public/assets');
+        require_once $root . '/Manager/CatalogImageUpload.php';
 
+        if ($route === 'Controller/CatalogImageController.php') {
+            return $root . '/' . $route;
+        }
         return RequireSession::check($route) ? $root . '/' . $route : null;
     }
 }

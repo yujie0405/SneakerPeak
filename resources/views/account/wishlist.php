@@ -66,7 +66,7 @@
                     ?>
                     <tr>
                         <td><?php echo $count++; ?></td>
-                        <td><img src="prod/<?php echo $productPicture; ?>" alt=""></td>
+                        <td><img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($productPicture)) ?>" alt=""></td>
                         <td><?php echo $rows['prod_name']; ?></td>
                         <td><?php echo $rows['Prod_SubC']; ?></td>
                         <td><button data-product="<?= htmlspecialchars($prodName) ?>" onclick="viewprod(this.dataset.product)">View</button></td>

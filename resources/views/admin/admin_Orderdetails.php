@@ -321,7 +321,7 @@ thead th.active,tbody td.active {
                   <td><?=$count?></td>
                   <td>
                     <div class="product">
-                      <img src="prod/<?php echo  $productPicture?>" alt="">
+                      <img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($productPicture)) ?>" alt="">
                       <h3><?php echo $rows['Order_Product'] ?></h3>
                     </div>
                   </td>

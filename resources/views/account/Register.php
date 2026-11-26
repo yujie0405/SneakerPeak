@@ -3,7 +3,7 @@
 
       $db = \Config\Database::getInstance();
       $conn = $db->getConnection();
-    require_once SNEAKERPEAK_ROOT . '/src/App/Controllers/AuthController.php';
+    require_once SNEAKERPEAK_ROOT . '/Controller/AuthController.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

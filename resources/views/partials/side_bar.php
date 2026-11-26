@@ -8,7 +8,7 @@
                         $name = $user["name"];
                         $image = $user["image"];
                     ?>
-                    <img src="img/<?php echo $image; ?>" width = 125 height = 125 title="<?php echo $image; ?>">
+                    <img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($image, \SneakerPeak\Manager\CatalogImageUpload::PROFILE)) ?>" width = 125 height = 125 alt="">
                     <div class="round">
                         <input type="file" name="image" id = "image" accept=".jpg, .jpeg, .png">
                         <i class = "fa fa-camera" style = "color: var(--color-surface);"></i>

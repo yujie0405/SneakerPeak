@@ -1,5 +1,5 @@
 <?php 
-    require_once SNEAKERPEAK_ROOT . '/src/App/Controllers/Legacy/controllerUser.php'; 
+    require_once SNEAKERPEAK_ROOT . '/Controller/AuthController.php';
 ?>
 <?php
     if($_SESSION['info'] == false)

@@ -1,0 +1,463 @@
+{
+    "column": {
+        "Field": "Audience",
+        "Type": "varchar(32)",
+        "Collation": "utf8mb4_unicode_ci",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": "",
+        "Extra": "",
+        "Privileges": "select,insert,update,references",
+        "Comment": ""
+    },
+    "rows": [
+        {
+            "Id": "102",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "103",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "104",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "105",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "106",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "107",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "108",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "109",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "110",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "111",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "112",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "113",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "114",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "115",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "116",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "117",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "118",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "119",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "120",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "121",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "122",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "123",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "124",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "125",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "126",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "127",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "128",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "129",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "130",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "131",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "132",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "133",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "134",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "135",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "136",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "137",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "138",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "139",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "140",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "141",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "142",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "143",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "144",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "145",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "146",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "147",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "148",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "149",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "150",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "151",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "152",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "153",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "154",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "155",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "156",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "157",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "158",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "159",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "160",
+            "Audience": "Female",
+            "CategoryId": "2",
+            "MatchedId": "2",
+            "CategoryName": "Female"
+        },
+        {
+            "Id": "161",
+            "Audience": "Kid",
+            "CategoryId": "3",
+            "MatchedId": "3",
+            "CategoryName": "Kid"
+        },
+        {
+            "Id": "162",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "163",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "164",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        },
+        {
+            "Id": "165",
+            "Audience": "Male",
+            "CategoryId": "1",
+            "MatchedId": "1",
+            "CategoryName": "Male"
+        }
+    ]
+}

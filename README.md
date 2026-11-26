@@ -11,9 +11,9 @@ SneakerPeak is a PHP 8.2 storefront and admin application for XAMPP. It uses Mar
 
 ## Routes and assets
 
-The public entry point is `public/index.php`. The legacy filenames are registered in `src/Config/routes.php`, including case-insensitive aliases such as `payment.php` and `admin_OrderDetails.php`. Apache preserves the old `/SneakerPeak/` entry point and legacy image, script, stylesheet, and font URLs. Product image filenames stored in the database remain valid. Uploads go to `public/assets/prod`, `public/assets/image/logo`, and `public/assets/img`.
+The public entry point is `public/index.php`. The legacy filenames are registered in `src/Config/routes.php`, including case-insensitive aliases such as `payment.php` and `admin_OrderDetails.php`. Apache preserves the old `/SneakerPeak/` entry point and legacy image, script, stylesheet, and font URLs. Existing product, logo, and profile image filenames continue to resolve from the legacy asset folders.
 
-The homepage, catalog, sign-in, customer profiles, wishlists, cart, checkout, order history, admin dashboards, and admin product and order management use controllers under `src/App/Controllers`. Legacy scripts dispatch through the same entry point. Catalog creation and promotion views still contain some of their original queries and request handling. The shared palette is in `public/assets/css/theme.css`.
+The homepage, catalog, sign-in, customer profiles, wishlists, cart, checkout, order history, admin dashboards, and admin product and order management use controllers under `Controller`. Legacy scripts dispatch through the same entry point. Promotion views still contain some of their original queries and request handling. The shared palette is in `public/assets/css/theme.css`.
 
 Cart checkout takes prices and shipping from the server and snapshots the order and lines. Address selection saves the address snapshot and payment method. Demo completion locks the owned order, updates inventory, removes the matching cart lines, and marks the payment complete in one transaction. A repeated completion leaves inventory unchanged.
 
@@ -29,7 +29,7 @@ The bundled Stripe PHP library and `prod.zip` are outside the document root. The
 | `cart.php`, `selectaddress.php`, `Payment.php` | GET views or POST forms with cart token | Checkout proceeds to the shipping address, payment method, and invoice. |
 | `fetch_address.php` | GET `addressOption` | Checkout receives plain text from the signed-in customer's saved address. |
 | `admin_productdetails.php` | GET `prodName`; POST edits with catalog token | Admin product list links directly to the selected product. The controller also accepts the legacy session selection. |
-| `delete_item.php`, `Available_item.php`, `update_status.php` | POST product ID or product and size, with catalog token | Admin catalog pages receive plain-text status feedback. |
+| `delete_item.php`, `Available_item.php` | POST product ID and catalog token | Admin catalog pages update overall product status. |
 | `changestatus.php`, `telluser.php` | POST order code and order token | Admin order details receives plain-text status feedback and the controller sends the configured notification. |
 
 ## Migrated database
@@ -41,3 +41,13 @@ Users with a null PasswordHash need Forgot Password before signing in. This also
 The live read-only check found nine users with null password hashes, including four admins. Six imported orders have no shipping snapshot, and one order line has no current product reference. Shipment data remains blank when the migration could not establish a snapshot. The order line still displays its saved description, size, price and quantity. Imported size systems are UNSPECIFIED. The current size-label forms remain unambiguous because the active schema has no product with repeated size labels across systems.
 
 On the migrated database copy, verify customer and admin login, denied customer access to admin pages, registration, verification, recovery, saved addresses, catalog and product details, wishlist, cart, promotions, demo checkout, repeat payment submission, order history, invoices, receipts, and admin management. Route tests ran with a local mail capture and demo payments enabled. SMTP delivery to a real mailbox and real payment processing require separate verification. The legacy Search and filter routes lead to the catalog, and the old call_pic and t demo routes lead to the scoped cart.
+
+## Product categories and image storage
+
+For an existing migrated MariaDB database, apply database/migrations/001-product-categories.sql before using the updated product pages. Select the migrated database in phpMyAdmin before importing the migration. It backfills product categories from Audience, leaves the original values available for reconciliation, and keeps subcategory assignments independent. Resolve duplicate product names before applying the migration if your database contains any.
+
+Set IMAGE_BASE_DIR to a directory writable by PHP. A relative path resolves from the repository root. The XAMPP default is storage/catalog-images, which is outside the public document root. The app creates Product, UserProfile, and Logo folders as needed and stores relative image paths. Existing uploads in public/assets keep their original URLs. Back up the configured image directory alongside the database.
+
+Apply database/migrations/002-product-image-paths.sql to backfill imported product image paths. The product image columns store `prod/filename` for files under `public/assets/prod` and `Product/filename` for uploads under IMAGE_BASE_DIR. Product listings and details resolve both stored path formats.
+
+Product drafts submit the product and size rows together. In a JavaScript-enabled browser, server-side validation keeps the draft and selected images in the form. Update a size quantity and its availability separately from product details. To delete a referenced brand, category, or subcategory, reassign its products using Edit product first.

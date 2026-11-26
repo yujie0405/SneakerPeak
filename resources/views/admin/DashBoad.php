@@ -51,7 +51,7 @@
             <div class="board">
               <div class="product">
                 <div class="img">
-                  <img src="prod/<?php echo rawurlencode($product['Prod_img1']);?>" alt="">
+                  <img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($product['Prod_img1'])) ?>" alt="">
                 </div>
 
                 <div class="pname">

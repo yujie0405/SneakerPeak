@@ -12,12 +12,14 @@ final class ProductModel
 {
     // Preserve the storefront field names while joining the migrated lookup tables.
     public const CATALOG = "SELECT p.Id AS Prod_ID, p.Name AS Prod_Name, b.Name AS Prod_Brand,
-        p.Price AS Prod_Price, p.Colour AS Prod_Colour, p.Audience AS Prod_Cetegory,
+        p.Price AS Prod_Price, p.Colour AS Prod_Colour, c.Name AS Prod_Cetegory,
+        p.BrandId, p.CategoryId, p.SubCategoryId,
         sc.Name AS Prod_SubC, p.Details AS Prod_Details, p.Image1Path AS Prod_img1,
         p.Image2Path AS Prod_img2, p.Image3Path AS Prod_img3,
         CASE st.Code WHEN 'DEACTIVATED' THEN 'Deleted' WHEN 'OUT_OF_STOCK' THEN 'out-of-stock'
              WHEN 'AVAILABLE' THEN 'available' ELSE LOWER(st.Code) END AS Prod_Status
         FROM T_Product p JOIN E_Brand b ON b.Id = p.BrandId
+        JOIN E_Category c ON c.Id = p.CategoryId
         JOIN E_SubCategory sc ON sc.Id = p.SubCategoryId
         JOIN E_ProductStatus st ON st.Id = p.ProductStatusId";
 
@@ -44,6 +46,28 @@ final class ProductModel
                 array_push($parameters, ...$values);
             }
         }
+        return self::paginate($connection, $where, $parameters, $requestedPage);
+    }
+
+    public static function adminBrowse(mysqli $connection, array $filters, int $requestedPage): array
+    {
+        $where = 'FROM (' . self::CATALOG . ') catalog WHERE 1 = 1';
+        $parameters = [];
+        foreach ([
+            'search' => 'Prod_Name LIKE ?', 'status' => 'Prod_Status = ?', 'brand' => 'Prod_Brand = ?',
+            'category' => 'CategoryId = ?', 'subcategory' => 'SubCategoryId = ?',
+            'min_price' => 'Prod_Price >= ?', 'max_price' => 'Prod_Price <= ?',
+        ] as $field => $condition) {
+            if ($filters[$field] !== '') {
+                $where .= ' AND ' . $condition;
+                $parameters[] = $field === 'search' ? '%' . $filters[$field] . '%' : $filters[$field];
+            }
+        }
+        return self::paginate($connection, $where, $parameters, $requestedPage);
+    }
+
+    private static function paginate(mysqli $connection, string $where, array $parameters, int $requestedPage): array
+    {
         $count = $connection->prepare("SELECT COUNT(*) $where");
         $count->execute($parameters);
         $total = (int) $count->get_result()->fetch_row()[0];

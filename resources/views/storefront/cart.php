@@ -119,7 +119,7 @@
                         
                         <td class="cart-product-cell">
                             <div class="cart-info">
-                                <img src="prod/<?= rawurlencode($row['Prod_Img1']) ?>" alt="">
+                                <img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($row['Prod_Img1'])) ?>" alt="">
                                 <div class="note">
                                     <p><?= htmlspecialchars($row['Product_Name']) ?></p>
                                     <small>Price: RM<?php echo number_format((float) $row['Current_Price'], 2); ?></small>

@@ -130,7 +130,7 @@
 					?>
     			<div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
     				<div class="product d-flex flex-column">
-                            <a  class="img-prod"><img class="img-fluid" src="prod/<?php echo rawurlencode($row['Prod_img1'] ?? '')?>" alt="Colorlib Template">
+                            <a  class="img-prod"><img class="img-fluid" src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url($row['Prod_img1'] ?? null)) ?>" alt="Colorlib Template">
     						<div class="overlay"></div>
     					</a>
     					<div class="text py-3 pb-4 px-3">

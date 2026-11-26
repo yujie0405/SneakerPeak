@@ -20,7 +20,7 @@ Review the shared markup in `resources/views/partials/header.php` and the existi
 
 ## 3. Turn the size-chart image into a readable listing
 
-Use the image referenced by `src/App/Controllers/Legacy/sizecar.php` as the source for the existing `sizecar.php` page. Transcribe its entries into HTML, keeping the original labels, values, units, and meaningful groupings. Flag any unreadable entry for review before publishing.
+Use the image referenced by `Controller/Legacy/sizecar.php` as the source for the existing `sizecar.php` page. Transcribe its entries into HTML, keeping the original labels, values, units, and meaningful groupings. Flag any unreadable entry for review before publishing.
 
 - Use titled sections for any groups shown in the source and semantic tables for size conversions. Give each table clear column headers and style the rows for easy scanning.
 - Keep the chart readable on narrow screens. If a table is wider than the screen, let the table scroll within its own container.
@@ -112,6 +112,6 @@ Make the entire admin interface more compact and easier to scan at normal browse
 
 ### Central image manager
 
-- Build a shared, configurable image manager using the existing `src/App/Services/CatalogImageUpload.php` where appropriate. Load the image base directory from environment configuration and route each supported image type through a fixed mapping. Use `Product/` for product images, with dedicated `UserProfile/` and `Logo/` folders for profile images and logos. Confirm the configured base path on the target installation.
+- Build a shared, configurable image manager using the existing `Manager/CatalogImageUpload.php` where appropriate. Load the image base directory from environment configuration and route each supported image type through a fixed mapping. Use `Product/` for product images, with dedicated `UserProfile/` and `Logo/` folders for profile images and logos. Confirm the configured base path on the target installation.
 - Validate file type and size, generate unique filenames, and store relative image paths in the database. Resolve display URLs consistently for new and existing images. Prevent a caller from specifying arbitrary filesystem destinations.
 - Verify image upload and display for each type, and test rollback after a failed product save. Confirm permissions for product and lookup edits and test referenced lookup deletion.

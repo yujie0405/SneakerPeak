@@ -1,6 +1,6 @@
 <?php 
     require SNEAKERPEAK_ROOT . '/database/Database_Connection.php';
-    require SNEAKERPEAK_ROOT . '/src/App/Controllers/AuthController.php';
+    require SNEAKERPEAK_ROOT . '/Controller/AuthController.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

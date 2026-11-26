@@ -18,13 +18,15 @@ This is the proposal for the second redesign of SneakerPeak, my diploma final-ye
 
 ## 3. Proposed folder structure
 
-Follow the Filetr.ee layout for `src/App`, `src/Core`, `src/Config`, `resources`, and `public`. Group SneakerPeak templates by storefront, account, and admin area. Serve existing CSS, JavaScript, images, and fonts from `public/assets/`. If the project continues to maintain SCSS, place its source files in `resources/assets/scss/`.
+Use the project-root `Controller/` for route handlers and follow the Filetr.ee layout for `src/App`, `src/Core`, `src/Config`, `resources`, and `public`. Group SneakerPeak templates by storefront, account, and admin area. Serve existing CSS, JavaScript, images, and fonts from `public/assets/`. If the project continues to maintain SCSS, place its source files in `resources/assets/scss/`.
 
 ```text
 SneakerPeak/
+├── Controller/
+│   ├── Admin/
+│   └── Legacy/
 ├── src/
 │   ├── App/
-│   │   ├── Controllers/
 │   │   ├── Models/
 │   │   ├── Services/
 │   │   └── Middleware/
@@ -61,7 +63,7 @@ SneakerPeak/
 
 | Existing files | Proposed migration |
 | --- | --- |
-| `Controller/ProductController.php`, `Controller/UserController.php` | Move to `src/App/Controllers/` and check namespaces and callers. |
+| `Controller/ProductController.php`, `Controller/UserController.php` | Keep in the project-root `Controller/` directory and check callers. |
 | `index.php`, `cart.php`, `OrderHistory.php`, `admin-Orderlist.php` | Move rendering into the corresponding templates and keep form handling, queries, and permission checks in the application logic. Once the homepage logic moves, use `public/index.php` as the shared entry point. |
 | `header.php`, `footer.php`, `admin_sidebar.php` | Move reusable templates to `resources/views/partials/` and load them through the relevant layouts. |
 | `css/`, `js/`, `fonts/`, and image directories | Check references before moving these assets into `public/assets/`. Check product image paths stored in the database and identify the directories used for uploads. |

@@ -1,5 +1,5 @@
 <?php 
-    require_once SNEAKERPEAK_ROOT . '/src/App/Controllers/AuthController.php'; 
+    require_once SNEAKERPEAK_ROOT . '/Controller/AuthController.php';
 ?>
 <?php 
 $email = $_SESSION['email'];

@@ -11,7 +11,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 $customer = (string) ($_SESSION['CustomerID'] ?? '');
 $filters = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET;
 $search = is_string($filters['search'] ?? null) ? trim($filters['search']) : '';
-$categories = ['Male', 'Female', 'Kid'];
+$categories = array_column($conn->query('SELECT Name FROM E_Category ORDER BY Name')->fetch_all(MYSQLI_ASSOC), 'Name');
 $category = in_array($filters['Cate'] ?? null, $categories, true) ? $filters['Cate'] : '';
 $brandRows = $conn->query('SELECT Name AS Brand_Name FROM E_Brand')->fetch_all(MYSQLI_ASSOC);
 $subcategoryRows = $conn->query('SELECT Name AS S_Name FROM E_SubCategory')->fetch_all(MYSQLI_ASSOC);

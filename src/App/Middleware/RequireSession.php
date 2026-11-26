@@ -24,7 +24,7 @@ final class RequireSession
         $adminAction = in_array($name, self::ADMIN_ACTIONS, true);
         $customerAction = in_array($name, self::CUSTOMER_ACTIONS, true);
         $adminPage = str_starts_with($route, 'resources/views/admin/')
-            || str_starts_with($route, 'src/App/Controllers/Admin/');
+            || str_starts_with($route, 'Controller/Admin/');
         $customerPage = in_array($name, self::CUSTOMER_PAGES, true);
 
         if (session_status() !== PHP_SESSION_ACTIVE) session_start();
