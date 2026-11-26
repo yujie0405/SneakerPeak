@@ -1,7 +1,7 @@
 <?php
-     require_once SNEAKERPEAK_ROOT . '/config/Database.php';
+     require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
 
-      $db = \Config\Database::getInstance();
+      $db = \SneakerPeak\Core\Database::getInstance();
       $conn = $db->getConnection();
       
    class GetLimitItems {

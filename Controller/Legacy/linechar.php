@@ -1,6 +1,7 @@
 <?php
 // Perform your SQL query and fetch the results into an array
-include SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 
 // Check if the user has submitted a date range
 if (isset($_POST['start_date']) && isset($_POST['end_date'])) {

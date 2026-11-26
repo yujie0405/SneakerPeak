@@ -2,7 +2,8 @@
 
 use SneakerPeak\App\Models\WishlistModel;
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/WishlistModel.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();

@@ -1,6 +1,7 @@
 <?php
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/OrderModel.php';
 
 $orderCode = is_string($_GET['orderCode'] ?? null) ? $_GET['orderCode'] : '';

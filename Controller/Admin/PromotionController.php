@@ -4,7 +4,8 @@ use SneakerPeak\App\Services\AdminDateRange;
 use SneakerPeak\App\Services\CatalogInput;
 use SneakerPeak\App\Services\EmailService;
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/AdminDateRange.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/CatalogInput.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/EmailService.php';

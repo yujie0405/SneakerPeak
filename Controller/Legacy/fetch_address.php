@@ -6,7 +6,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !in_array($field, ['Customer_Address
     exit;
 }
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/UserModel.php';
 header('Content-Type: text/plain; charset=UTF-8');
 echo \SneakerPeak\App\Models\UserModel::address($conn, (string) $_SESSION['CustomerID'], $field === 'Customer_Address' ? 1 : 2);

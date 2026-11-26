@@ -9,7 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $token === null
     exit('Access denied.');
 }
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/EmailService.php';
 
 $path = strtolower(basename((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)));

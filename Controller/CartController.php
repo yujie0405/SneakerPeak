@@ -5,7 +5,8 @@ use SneakerPeak\App\Models\PromotionModel;
 use SneakerPeak\App\Services\CheckoutService;
 
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/CheckoutService.php';
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 $customer = (string) ($_SESSION['CustomerID'] ?? '');

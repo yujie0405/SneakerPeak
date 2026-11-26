@@ -3,7 +3,8 @@
 use SneakerPeak\App\Models\ProductModel;
 use SneakerPeak\App\Services\CatalogInput;
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/ProductModel.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/CatalogInput.php';
 

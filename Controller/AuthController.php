@@ -7,7 +7,8 @@ require_once SNEAKERPEAK_ROOT . '/src/App/Services/AuthService.php';
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/UserModel.php';
 use SneakerPeak\App\Models\UserModel;
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/PasswordResetService.php';
-require SNEAKERPEAK_ROOT . '/database/Database_Connection.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();

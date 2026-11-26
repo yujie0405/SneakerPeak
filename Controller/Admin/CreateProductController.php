@@ -4,7 +4,8 @@ use SneakerPeak\Manager\CatalogImageUpload;
 use SneakerPeak\App\Services\CatalogInput;
 use SneakerPeak\Manager\EncryptionManager;
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/CatalogInput.php';
 
 $catalogToken = $_SESSION['catalog_admin_token'] ??= bin2hex(random_bytes(32));

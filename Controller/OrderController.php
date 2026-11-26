@@ -2,7 +2,8 @@
 
 use SneakerPeak\App\Models\OrderModel;
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Models/OrderModel.php';
 
 $customer = (string) $_SESSION['CustomerID'];

@@ -1,6 +1,7 @@
 <?php
 
-require SNEAKERPEAK_ROOT . '/database/config.php';
+require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
+$conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 
 $name = $_GET['name'] ?? '';
 if (!is_string($name) || $name === '') {
