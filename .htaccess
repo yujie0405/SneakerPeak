@@ -1,0 +1,5 @@
+Options -Indexes
+RewriteEngine On
+RewriteRule ^(?:assets/)?((?:css|js|fonts|image|img|picture|prod)/.+|background\.png|sweetalert2\.all\.min\.js|style\.css|styles\.css|email\.css)$ public/assets/$1 [END,NC]
+RewriteRule ^(?:|[A-Za-z0-9_-]+\.php)$ public/index.php [END,NC]
+RewriteRule ^ - [F]

@@ -1,0 +1,61 @@
+:root {
+  --color-primary: #212529;
+  --color-accent: #dbcc8f;
+  --color-bg: #f8f9fa;
+  --color-surface: #fff;
+  --color-text: #212529;
+  --color-muted: #555e66;
+  --color-border: #ced4da;
+  --color-input-border: #737d86;
+  --color-success: #23733f;
+  --color-warning: #785900;
+  --color-danger: #b42335;
+  --color-focus: #8b6f1b;
+  --color-nav-hover: #343a40;
+}
+
+.bg-black { background-color: var(--color-primary) !important; }
+
+.ftco-navbar-light .navbar-toggler:focus-visible {
+  outline-color: var(--color-accent);
+}
+
+.owl-carousel.home-slider .slider-item .slider-text h1,
+.owl-carousel.home-slider .slider-item .slider-text p {
+  color: var(--color-text);
+}
+
+.swal2-styled.swal2-confirm {
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+body {
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+.btn-primary, .btn.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.btn-primary:hover, .btn.btn-primary:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-primary);
+}
+
+.form-control, .form-select {
+  border-color: var(--color-input-border);
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.text-success { color: var(--color-success) !important; }
+.text-warning { color: var(--color-warning) !important; }
+.text-danger { color: var(--color-danger) !important; }

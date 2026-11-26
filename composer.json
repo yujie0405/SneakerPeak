@@ -1,0 +1,13 @@
+{
+    "name": "sneakerpeak/sneakerpeak",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "ext-mysqli": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "SneakerPeak\\": "src/"
+        }
+    }
+}
