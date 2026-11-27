@@ -1,4 +1,7 @@
 /.env
 /.env.*
 !/.env.example
-/storage/catalog-images/
+/storage/catalog-images/*
+!/storage/catalog-images/Product/
+/storage/catalog-images/Product/*
+!/storage/catalog-images/Product/Imported/

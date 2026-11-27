@@ -113,7 +113,7 @@
                 <i class="fa fa-times"></i>
                 <div class="inform">
                     <div class="popup-image">
-                        <img src="prod/AIR FORCE 1 07B1.jpg" alt="">
+                        <img src="<?= htmlspecialchars(\SneakerPeak\Manager\CatalogImageUpload::url('AIR FORCE 1 07B1.jpg')) ?>" alt="">
                     </div>
                     <div class="cont">
                         <h4>Product Name</h4>

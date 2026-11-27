@@ -85,11 +85,23 @@ final class CatalogImageUpload
         if ($filename === '' || strpbrk($filename, "/\\\0") !== false || $filename === '.' || $filename === '..') {
             return $type === self::PROFILE ? 'img/noprofil.jpg' : '';
         }
+        if ($type === self::PRODUCT) {
+            return 'catalog-image.php?path=' . rawurlencode('Product/Imported/' . $filename);
+        }
         return $legacyPrefix . rawurlencode($filename);
     }
 
     public static function managedFile(string $relative): ?array
     {
+        if (preg_match('~^Product/Imported/([^/]+)$~D', $relative, $parts)) {
+            $filename = $parts[1];
+            if (strpbrk($filename, "\\\0") !== false || $filename === '.' || $filename === '..') {
+                return null;
+            }
+            $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $mime = self::MIME_TYPES[$extension === 'jpeg' ? 'jpg' : $extension] ?? null;
+            return $mime === null ? null : [\SNEAKERPEAK_ROOT . '/storage/catalog-images/' . $relative, $mime];
+        }
         if (!preg_match('~^(Product|UserProfile|Logo)/[a-f0-9]{32}\.(jpg|png|webp|gif)$~D', $relative, $parts)) {
             return null;
         }
@@ -98,6 +110,9 @@ final class CatalogImageUpload
 
     public static function remove(string $relative): void
     {
+        if (str_starts_with($relative, 'Product/Imported/')) {
+            return;
+        }
         $file = self::managedFile($relative);
         if ($file !== null && is_file($file[0]) && !@unlink($file[0])) {
             error_log('SneakerPeak could not remove a managed image.');
