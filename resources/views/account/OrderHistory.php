@@ -15,7 +15,17 @@
 <header><?php require SNEAKERPEAK_ROOT . '/resources/views/partials/header.php'; ?></header>
 <main class="customer-orders">
     <h1>Order history</h1>
+    <nav class="order-tabs" aria-label="Order history status">
+        <?php foreach (OrderModel::HISTORY_TABS as $value => $label) { ?>
+            <?php $tabQuery = http_build_query(['tab' => $value, 'sort' => $sort]
+                + array_diff_key($activeFilters, ['payment_status' => true, 'order_status' => true])); ?>
+            <a href="OrderHistory.php?<?= htmlspecialchars($tabQuery) ?>" <?= $tab === $value ? 'aria-current="page"' : '' ?>>
+                <?= htmlspecialchars($label) ?>
+            </a>
+        <?php } ?>
+    </nav>
     <form class="order-panel" method="get" action="OrderHistory.php">
+        <input type="hidden" name="tab" value="<?= $tab ?>">
         <div class="order-controls">
             <details>
                 <summary class="btn btn-primary">Sort</summary>
@@ -53,7 +63,7 @@
         </div>
         <div class="order-control-actions">
             <button class="btn btn-primary" type="submit">Apply</button>
-            <a href="OrderHistory.php?sort=<?= $sort ?>">Clear filters</a>
+            <a href="OrderHistory.php?tab=<?= $tab ?>&amp;sort=<?= $sort ?>">Clear filters</a>
             <span>Sorted by <?= strtolower(OrderModel::HISTORY_SORTS[$sort]) ?></span>
         </div>
     </form>
@@ -61,7 +71,7 @@
     <?php if ($error !== null) { ?>
         <p class="order-error" role="alert"><?= htmlspecialchars($error) ?></p>
     <?php } elseif (!$orders) { ?>
-        <p><?= $activeFilters ? 'No orders match these filters.' : 'You have no orders yet.' ?></p>
+        <p><?= $activeFilters ? 'No orders match these filters.' : 'There are no orders in this tab.' ?></p>
     <?php } ?>
 
     <div class="order-grid">

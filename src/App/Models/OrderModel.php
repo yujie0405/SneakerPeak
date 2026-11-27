@@ -18,6 +18,12 @@ final class OrderModel
         ShippingAddressSnapshot AS Order_Address, ShippingRecipientSnapshot AS Receiver_Name,
         ShippingPhoneSnapshot AS Receiver_Contract";
 
+    public const HISTORY_TABS = [
+        'payment' => 'Payment pending / failed',
+        'shipping' => 'Shipping',
+        'complete' => 'Complete',
+    ];
+
     public const HISTORY_SORTS = [
         'newest' => 'Newest first',
         'oldest' => 'Oldest first',
@@ -25,7 +31,7 @@ final class OrderModel
         'lowest' => 'Lowest total',
     ];
 
-    public static function history(mysqli $connection, string $customer, string $sort, array $filters): array
+    public static function history(mysqli $connection, string $customer, string $sort, array $filters, string $tab): array
     {
         $orderBy = match ($sort) {
             'oldest' => 'OrderedOn IS NULL, OrderedOn ASC, Id ASC',
@@ -33,7 +39,12 @@ final class OrderModel
             'lowest' => '(NetItemsAmount + ShippingFee) ASC, Id DESC',
             default => 'OrderedOn IS NULL, OrderedOn DESC, Id DESC',
         };
-        $conditions = ['UserId = ?'];
+        $tabCondition = match ($tab) {
+            'shipping' => "PaymentStatus = 'Complete' AND OrderStatus IN ('Pending', 'Shipping', 'Shipped')",
+            'complete' => "PaymentStatus = 'Complete' AND OrderStatus = 'Complete'",
+            default => "PaymentStatus IN ('Paying', 'Failed')",
+        };
+        $conditions = ['UserId = ?', $tabCondition];
         $values = [$customer];
         foreach ([
             'code' => 'LOCATE(?, OrderCode) > 0',

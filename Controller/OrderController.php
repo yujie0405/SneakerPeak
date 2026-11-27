@@ -17,8 +17,10 @@ foreach (['code', 'from', 'to', 'order_status', 'payment_status'] as $field) {
 }
 $sort = $read('sort');
 $sort = isset(OrderModel::HISTORY_SORTS[$sort]) ? $sort : 'newest';
+$tab = $read('tab');
+$tab = isset(OrderModel::HISTORY_TABS[$tab]) ? $tab : 'payment';
 $activeFilters = array_filter($criteria, static fn(string $value): bool => $value !== '');
-$returnCriteria = http_build_query(['sort' => $sort] + $activeFilters);
+$returnCriteria = http_build_query(['tab' => $tab, 'sort' => $sort] + $activeFilters);
 $historyUrl = 'OrderHistory.php?' . $returnCriteria;
 
 if ($page === 'orderhistory.php') {
@@ -28,7 +30,7 @@ if ($page === 'orderhistory.php') {
             $error ??= 'Choose a supported status.';
         }
     }
-    $orders = $error === null ? OrderModel::history($conn, $customer, $sort, $criteria) : [];
+    $orders = $error === null ? OrderModel::history($conn, $customer, $sort, $criteria, $tab) : [];
     require SNEAKERPEAK_ROOT . '/resources/views/account/OrderHistory.php';
     return;
 }
