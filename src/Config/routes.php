@@ -10,6 +10,7 @@ return array (
   'login.php' => 'resources/views/account/Login.php',
   'logout.php' => 'Controller/Legacy/Logout.php',
   'orderhistory.php' => 'Controller/OrderController.php',
+  'orderdetails.php' => 'Controller/OrderController.php',
   'password_setting.php' => 'Controller/CustomerProfileController.php',
   'payment.php' => 'Controller/PaymentController.php',
   'register.php' => 'resources/views/account/Register.php',

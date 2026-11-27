@@ -181,3 +181,40 @@ WHERE p.TypeId IS NULL;
 
 - Redesign `resources/views/admin/add_newAdmin.php` using the shared admin form styles. Group the existing account and credential fields logically, use compact spacing and clear labels, and stack fields on narrow screens. Provide field-level errors and preserve valid non-password input after a failed submission.
 - Keep the create action and cancel action clear. Preserve the existing authorization rules and verify successful creation, duplicate-email errors, and password validation. Ensure creation keeps `T_User.IsAdmin` and the corresponding `T_Admin` row consistent.
+
+## 13. Improve customer addresses and checkout
+
+### Saved addresses in the customer profile
+
+- Add a **Saved addresses** section to the customer profile. List the signed-in customer's addresses from `T_CustomerAddress` as cards with the recipient name, phone number, and address when available. Show an empty state and an **Add address** action.
+- Let customers add an address and delete an existing one after confirmation. Identify each address by `T_CustomerAddress.Id` and scope all reads and writes to the signed-in customer. Use CSRF-protected submissions and preserve shipping snapshots on existing orders.
+- Support multiple saved addresses. Replace assumptions about two fixed address slots in the profile and checkout. Preserve existing saved records.
+
+### Checkout address and payment method
+
+- Redesign `selectaddress.php` as a checkout page with **Shipping address** first and **Payment method** second. On desktop, place the order summary alongside the form. On narrow screens, stack the summary and form without horizontal scrolling.
+- Show saved addresses as selectable cards and provide an **Enter a new address** option with labeled recipient, phone, and address fields. Let customers optionally save the new address to their profile. If there are no saved addresses, open the manual-entry form automatically.
+- After a valid address is selected or entered, let the customer choose one of the supported payment methods. Provide one **Continue to payment** action. Preserve entered values when validation fails and save the chosen shipping details as an order snapshot before moving to the payment page.
+
+### Payment confirmation
+
+- Simplify `Payment.php` to show the order total, shipping address, and selected payment method, with one primary **Pay** button. Provide a back link to change the address or method before paying.
+- In local demo mode, one click should submit the demo payment and open the invoice after it succeeds. Use the existing checkout service to check order ownership and the server-calculated amount. Prevent duplicate submissions in the UI and handle repeated requests on the server without charging or reducing stock twice.
+- If a live payment provider is configured, the same button should start its payment flow and mark the order paid only after provider confirmation. When payment is unavailable or fails, show a clear message and allow a safe retry. Keep the order unpaid until successful completion.
+- Verify checkout with a saved address, a one-time address, and a new address saved to the profile. Check failed validation, the available payment methods, a repeated Pay submission, and the successful redirect to the invoice.
+
+## 14. Improve customer order history and details
+
+### Order history controls
+
+- In `resources/views/account/OrderHistory.php`, add a visible **Sort** button with **Newest first**, **Oldest first**, **Highest total**, and **Lowest total** options. Default to newest first and use the order ID to break ties.
+- Add a **Filter** button for order code, date range, order status, and payment status. Apply supplied filters together and allow either date bound independently. Show the active sort and filters, provide a clear action, and distinguish between an empty order history and a search with no matches.
+- Apply sorting and filtering on the server to orders owned by the signed-in customer. Preserve the selected criteria when navigating the list.
+
+### Order cards and View Order
+
+- Show the order code, order date, order status, payment status, total with currency, and total quantity purchased on each card. Use the totals captured at checkout and keep the cards readable on narrow screens.
+- Add a **View Order** button to each card. Open a customer order details page for that specific order and verify ownership on the server before displaying it.
+- Show the purchased items with their saved names, sizes, quantities, unit prices, and line totals from `T_OrderLineItem`. Include the order summary, shipping address snapshot, and payment method when available. Keep receipt access for eligible orders.
+- Use the saved order details when a product has been renamed or removed. If an imported order has missing line items or shipping information, show a clear message for that section.
+- Verify sorting, combined filters, empty results, order details on mobile, and that a customer cannot view another customer's order.

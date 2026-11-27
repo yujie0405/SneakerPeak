@@ -7,8 +7,8 @@ require_once SNEAKERPEAK_ROOT . '/src/Core/Database.php';
 $conn = \SneakerPeak\Core\Database::getInstance()->getConnection();
 require_once SNEAKERPEAK_ROOT . '/src/App/Services/AuthService.php';
 
-require_once SNEAKERPEAK_ROOT . '/src/App/Models/UserModel.php';
-use SneakerPeak\App\Models\UserModel;
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/CustomerAddressModel.php';
+use SneakerPeak\App\Models\CustomerAddressModel;
 $table = $isAdmin ? 'admin' : 'customer';
 $profileId = (string) $_SESSION[$isAdmin ? 'AdminID' : 'CustomerID'];
 $profileUrl = $isAdmin ? 'admin_profile.php' : 'profile_1.php';
@@ -27,7 +27,15 @@ $page = $_SESSION['page'] = $tab === 2 ? 2 : 1;
 $save = isset($_POST['update']);
 $change = isset($_POST['change']);
 $upload = isset($_FILES['image']);
-if ($save || $change || $upload) {
+$addAddress = !$isAdmin && isset($_POST['add_address']);
+$deleteAddress = !$isAdmin && isset($_POST['delete_address']);
+$recipient = trim((string) ($_POST['recipient'] ?? ''));
+$addressPhone = trim((string) ($_POST['phone'] ?? ''));
+$address = trim((string) ($_POST['address'] ?? ''));
+if ($addAddress || $deleteAddress) {
+    $page = $_SESSION['page'] = 1;
+}
+if ($save || $change || $upload || $addAddress || $deleteAddress) {
     if (!hash_equals($token, (string) ($_POST['profile_token'] ?? ''))) {
         http_response_code(403);
         exit('Please reload your profile and try again.');
@@ -40,20 +48,27 @@ if ($save || $change || $upload) {
             if ($name === '') {
                 throw new DomainException('Enter your name.');
             }
+            $conn->execute_query('UPDATE T_User SET DisplayName = ?, Phone = ? WHERE Id = ?', [$name, $phone, $profileId]);
+            $_SESSION['name'] = $name;
+            $_SESSION['profile_message'] = 'Your information has been updated.';
+        } elseif ($addAddress) {
+            CustomerAddressModel::validate($recipient, $addressPhone, $address);
             $conn->begin_transaction();
             try {
-                $conn->execute_query('UPDATE T_User SET DisplayName = ?, Phone = ? WHERE Id = ?', [$name, $phone, $profileId]);
-                if (!$isAdmin) {
-                    UserModel::saveAddress($conn, $profileId, 1, (string) ($_POST['cus_address'] ?? ''));
-                    UserModel::saveAddress($conn, $profileId, 2, (string) ($_POST['cus_address_2'] ?? ''));
-                }
+                CustomerAddressModel::add($conn, $profileId, $recipient, $addressPhone, $address);
                 $conn->commit();
             } catch (Throwable $error) {
                 $conn->rollback();
                 throw $error;
             }
-            $_SESSION['name'] = $name;
-            $_SESSION['profile_message'] = 'Your information has been updated.';
+            $_SESSION['profile_message'] = 'Your address has been saved.';
+        } elseif ($deleteAddress) {
+            $addressId = (string) ($_POST['delete_address'] ?? '');
+            if (!ctype_digit($addressId)) {
+                throw new DomainException('Choose a saved address to delete.');
+            }
+            CustomerAddressModel::delete($conn, $profileId, $addressId);
+            $_SESSION['profile_message'] = 'Your address has been deleted.';
         } elseif ($change) {
             if (!AuthService::changePassword($conn, $table, $profileId, (string) ($_POST['old_password'] ?? ''),
                 (string) ($_POST['password'] ?? ''), (string) ($_POST['cpassword'] ?? ''))) {
@@ -101,7 +116,6 @@ if ($isAdmin) {
     $cus_name = $profile['name'];
     $cus_email = $profile['email'];
     $cus_phone = ($profile['Phone'] ?? '');
-    $cus_address = UserModel::address($conn, $profileId, 1);
-    $cus_address2 = UserModel::address($conn, $profileId, 2);
+    $addresses = CustomerAddressModel::all($conn, $profileId);
     require SNEAKERPEAK_ROOT . '/resources/views/account/profile_1.php';
 }

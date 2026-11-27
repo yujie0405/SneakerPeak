@@ -1,0 +1,43 @@
+.customer-orders {
+    max-width: 72rem;
+    margin: 2rem auto 4rem;
+    padding: 0 1rem;
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+}
+
+.customer-orders h2 { font-size: 1.25rem; }
+.customer-orders a:not(.btn) { color: var(--color-primary); text-decoration: underline; }
+.customer-orders :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+.order-panel {
+    min-width: 0;
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border: 1px solid var(--color-border);
+    border-radius: .75rem;
+    background: var(--color-surface);
+}
+
+.order-controls { display: flex; flex-wrap: wrap; align-items: start; gap: 1rem; }
+.order-controls summary { width: fit-content; }
+.order-controls label { display: block; margin: .5rem 0 0; }
+.order-controls .form-control { border: 1px solid var(--color-input-border) !important; }
+.order-filter-fields, .order-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+}
+.order-controls details:nth-child(2)[open] { flex: 1 1 28rem; min-width: 0; }
+.order-control-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1rem; }
+.order-grid, .order-items, .order-error { margin-top: 1rem; }
+.order-error { color: var(--color-danger); }
+.order-card { display: flex; flex-direction: column; align-items: flex-start; }
+.order-card > a { margin-top: auto; }
+.order-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1rem; width: 100%; }
+.order-facts dd { margin-bottom: 0; }
+.order-address { display: block; white-space: pre-line; }
+.order-table-scroll { overflow-x: auto; }
+.order-table { width: 100%; border-collapse: collapse; min-width: 29rem; }
+.order-table th, .order-table td { padding: .6rem; border-bottom: 1px solid var(--color-border); }
+.order-table th:nth-child(n+3), .order-table td:nth-child(n+3) { text-align: right; white-space: nowrap; }
+.order-back { display: inline-block; margin-bottom: .75rem; }

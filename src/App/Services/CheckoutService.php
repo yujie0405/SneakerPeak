@@ -6,10 +6,12 @@ use DomainException;
 use mysqli;
 use SneakerPeak\App\Models\CartModel;
 use SneakerPeak\App\Models\PromotionModel;
+use SneakerPeak\App\Models\OrderModel;
 use Throwable;
 
 require_once dirname(__DIR__) . '/Models/CartModel.php';
 require_once dirname(__DIR__) . '/Models/PromotionModel.php';
+require_once dirname(__DIR__) . '/Models/OrderModel.php';
 
 final class CheckoutService
 {
@@ -104,8 +106,12 @@ final class CheckoutService
         }
     }
 
-    public static function completeDemo(mysqli $connection, string $customerId, string $orderCode, string $method): void
+    public static function recordDemoPayment(mysqli $connection, string $customerId, string $orderCode, string $method, string $status): void
     {
+        if (!isset(OrderModel::PAYMENT_STATUSES[$status])) {
+            throw new DomainException('Choose a demo payment outcome.');
+        }
+
         $connection->begin_transaction();
         try {
             $order = $connection->prepare(
@@ -116,12 +122,19 @@ final class CheckoutService
             if (!$current || $current['Payment_Type'] !== $method) {
                 throw new DomainException('This checkout no longer matches the selected payment method.');
             }
-            if ($current['Payment_Status'] === 'Complete') {
+            if ($current['Payment_Status'] === 'Complete' && $status === 'Complete') {
                 $connection->commit();
                 return;
             }
-            if ($current['Payment_Status'] !== 'Paying') {
+            if (!in_array($current['Payment_Status'], OrderModel::UNPAID_STATUSES, true)) {
                 throw new DomainException('This order is no longer awaiting payment.');
+            }
+
+            $update = $connection->prepare('UPDATE T_Order SET PaymentStatus = ? WHERE Id = ?');
+            if ($status !== 'Complete') {
+                $update->execute([$status, $current['Id']]);
+                $connection->commit();
+                return;
             }
 
             $lines = $connection->prepare(
@@ -152,8 +165,7 @@ final class CheckoutService
                 $cart->execute([$customerId, $item['ProductId'], $item['SizeId'], $quantity]);
             }
 
-            $update = $connection->prepare("UPDATE T_Order SET PaymentStatus = 'Complete' WHERE UserId = ? AND OrderCode = ?");
-            $update->execute([$customerId, $orderCode]);
+            $update->execute([$status, $current['Id']]);
             $connection->commit();
         } catch (Throwable $error) {
             $connection->rollback();

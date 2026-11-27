@@ -8,12 +8,8 @@ if (!is_string($code) || $code === '') {
     http_response_code(400);
     exit;
 }
-$statement = $conn->prepare(
-    "UPDATE T_Order SET ConfirmationRequested = 0, OrderStatus = 'Complete'
-     WHERE UserId = ? AND OrderCode = ? AND ConfirmationRequested <> 0"
-);
-$statement->execute([(string) $_SESSION['CustomerID'], $code]);
-if (!$statement->affected_rows) {
+require_once SNEAKERPEAK_ROOT . '/src/App/Models/OrderModel.php';
+if (!\SneakerPeak\App\Models\OrderModel::confirmReceipt($conn, (string) $_SESSION['CustomerID'], $code)) {
     http_response_code(409);
     exit('This order cannot be completed.');
 }

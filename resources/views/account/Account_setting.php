@@ -22,24 +22,13 @@
                             <small class="form-text text-muted">Example: +6012-3456789 or 012-3456789</small>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>Address 1</label>
-                            <input type="text" class="form-control" value="<?= htmlspecialchars((string) $cus_address) ?>" name="cus_address" required>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>Address 2</label>
-                            <input type="text" class="form-control" value="<?= htmlspecialchars((string) $cus_address2) ?>" name="cus_address_2">
-                        </div>
-                    </div>
                 </div>
                 <div>
                     <button class="btn btn-primary" type="submit" name="update">Update</button>
                     <button class="btn btn-light" name="cancel" onclick="redirectToIndex(); return false;">Back</button>
                 </div>
             </form>
+            <?php require SNEAKERPEAK_ROOT . '/resources/views/account/saved-addresses.php'; ?>
         </div>
 <script>
     function redirectToIndex() 
